@@ -76,8 +76,24 @@ typedef enum
 {
     DLMS_SOURCE_DIAGNOSTIC_NONE = 0,
     DLMS_SOURCE_DIAGNOSTIC_NO_REASON_GIVEN = 1,
-    //Application context name not supported.
+    // Application context name not supported.
     DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CONTEXT_NAME_NOT_SUPPORTED = 2,
+    // Calling AP title not recognized.
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AP_TITLE_NOT_RECOGNIZED = 3,
+    // Calling AP invocation identifier not recognized.
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED = 4,
+    // Calling AE qualifier not recognized
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AE_QUALIFIER_NOT_RECOGNIZED = 5,
+    // Calling AE invocation identifier not recognized
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLING_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED = 6,
+    // Called AP title not recognized
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AP_TITLE_NOT_RECOGNIZED = 7,
+    // Called AP invocation identifier not recognized
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AP_INVOCATION_IDENTIFIER_NOT_RECOGNIZED = 8,
+    // Called AE qualifier not recognized
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AE_QUALIFIER_NOT_RECOGNIZED = 9,
+    // Called AE invocation identifier not recognized
+    DLMS_SOURCE_DIAGNOSTIC_APPLICATION_CALLED_AE_INVOCATION_IDENTIFIER_NOT_RECOGNIZED = 10,
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_NOT_RECOGNISED = 11,
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_MECHANISM_NAME_REQUIRED = 12,
     DLMS_SOURCE_DIAGNOSTIC_AUTHENTICATION_FAILURE = 13,
@@ -211,7 +227,7 @@ enum DLMS_CONTROL_MODE
 };
 
 //Is logican name assosiated.
-typedef enum 
+typedef enum
 {
     DLMS_ASSOCIATION_STATUS_NON_ASSOCIATED,
     DLMS_ASSOCIATION_STATUS_ASSOCIATION_PENDING,
@@ -1067,7 +1083,52 @@ typedef enum
     /*
     * Event Notification request.
     */
-    DLMS_COMMAND_EVENT_NOTIFICATION = 0xC2
+    DLMS_COMMAND_EVENT_NOTIFICATION = 0xC2,
+
+    /**
+    * Ded get request.
+    */
+    DLMS_COMMAND_DED_GET_REQUEST = 0xD0,
+
+    /**
+    * Ded get response.
+    */
+    DLMS_COMMAND_DED_GET_RESPONSE = 0xD4,
+
+    /**
+    * Ded set request.
+    */
+    DLMS_COMMAND_DED_SET_REQUEST = 0xD1,
+
+    /**
+    * Ded set response.
+    */
+    DLMS_COMMAND_DED_SET_RESPONSE = 0xD5,
+
+    /**
+    * Ded event notification request.
+    */
+    DLMS_COMMAND_DED_EVENT_NOTIFICATION = 0xD2,
+
+    /**
+    * Ded method request.
+    */
+    DLMS_COMMAND_DED_METHOD_REQUEST = 0xD3,
+
+    /**
+    * Ded method response.
+    */
+    DLMS_COMMAND_DED_METHOD_RESPONSE = 0xD7,
+
+    /**
+    * Request message from client to gateway.
+    */
+    DLMS_COMMAND_GATEWAY_REQUEST = 0xE6,
+
+    /**
+    * Response message from gateway to client.
+    */
+    DLMS_COMMAND_GATEWAY_RESPONSE = 0xE7
 } DLMS_COMMAND;
 
 typedef enum
@@ -2222,4 +2283,13 @@ typedef enum {
     DLMS_APPLICATION_CONTEXT_NAME_SHORT_NAME_WITH_CIPHERING = 4
 }DLMS_APPLICATION_CONTEXT_NAME;
 
+// Connection types.
+typedef enum {
+    //Connection is not made for the meter.
+    DLMS_CONNECTION_STATE_NONE = 0,
+    //Connection is made for HDLC level.
+    DLMS_CONNECTION_STATE_HDLC = 1,
+    //Connection is made for DLMS level.
+    DLMS_CONNECTION_STATE_DLMS = 2
+}DLMS_CONNECTION_STATE;
 #endif //ENUMS_H

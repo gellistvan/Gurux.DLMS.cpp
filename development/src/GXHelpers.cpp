@@ -958,7 +958,7 @@ int GetInt32(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& value)
 
 
 //Reserved for internal use.
-static void ToBitString(CGXByteBuffer& sb, unsigned char value, int count)
+void GXHelpers::ToBitString(CGXByteBuffer& sb, unsigned char value, int count)
 {
     if (count > 0) {
         if (count > 8) {
@@ -1012,7 +1012,7 @@ static int GetBitString(CGXByteBuffer& buff, CGXDataInfo& info, CGXDLMSVariant& 
         {
             return ret;
         }
-        ToBitString(bb, ch, cnt);
+        GXHelpers::ToBitString(bb, ch, cnt);
         if (cnt < 8)
         {
             break;
@@ -1492,8 +1492,12 @@ static int SetUtfString(CGXByteBuffer& buff, CGXDLMSVariant& value)
 
 int GXHelpers::SetLogicalName(const char* name, CGXDLMSVariant& value)
 {
-    unsigned char ln[6];
-    int ret = SetLogicalName(name, ln);
+    unsigned char ln[6] = {0};
+    int ret = 0;
+    if (name != NULL && *name != '\0')
+    {
+        ret = SetLogicalName(name, ln);
+    }
     if (ret == 0)
     {
         value.Clear();
@@ -1546,21 +1550,16 @@ static int SetString(CGXByteBuffer& buff, CGXDLMSVariant& value)
     return 0;
 }
 
-/**
-* Convert Bit string to DLMS bytes.
-*
-* buff
-*            Byte buffer where data is write.
-* value
-*            Added value.
-*/
-static int SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value)
+int GXHelpers::SetBitString(CGXByteBuffer& buff, CGXDLMSVariant& value, bool addCount)
 {
     unsigned char val = 0;
     int index = 7;
     if (value.vt == DLMS_DATA_TYPE_STRING)
     {
-        GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
+        if (addCount)
+        {
+            GXHelpers::SetObjectCount((unsigned long)value.strVal.size(), buff);
+        }
         for (std::string::iterator it = value.strVal.begin(); it != value.strVal.end(); ++it)
         {
             if (*it == '1')
@@ -1647,7 +1646,7 @@ int GXHelpers::SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant&
         buff.SetDouble(value.dblVal);
         break;
     case DLMS_DATA_TYPE_BIT_STRING:
-        return SetBitString(buff, value);
+        return SetBitString(buff, value, true);
         break;
     case DLMS_DATA_TYPE_STRING:
         return SetString(buff, value);
