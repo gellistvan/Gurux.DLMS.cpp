@@ -31,49 +31,22 @@
 // This code is licensed under the GNU General Public License v2.
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
+#include <mbed.h>
+// GuruxDLMSClientExample.cpp : Defines the entry point for the Gurux DLMS Client example.
+#include "communication.h"
+#include "dlms/include/GXDLMSSecureClient.h"
 
-#include "../include/GXDLMSObjectDefinition.h"
-#include <sstream>
-#include "../include/GXDLMSConverter.h"
-
-CGXDLMSObjectDefinition::CGXDLMSObjectDefinition()
+int main(void)
 {
-
+    int ret;
+    CGXDLMSSecureClient cl(true);
+    CGXCommunication comm(&cl, GX_TRACE_LEVEL_OFF);
+    if ((ret = comm.ReadAll()) != 0)
+    {
+        return ret;
+    }
+    //Close connection.
+    comm.Close();
+    return 0;
 }
 
-/*
- * Constructor
- */
-CGXDLMSObjectDefinition::CGXDLMSObjectDefinition(DLMS_OBJECT_TYPE classId, std::string logicalName)
-{
-    m_ClassId = classId;
-    m_LogicalName = logicalName;
-}
-
-std::string CGXDLMSObjectDefinition::ToString()
-{
-    std::stringstream sb;
-    sb << CGXDLMSConverter::ToString(m_ClassId);
-    sb << " ";
-    sb << m_LogicalName.c_str();
-    return sb.str();
-}
-
-DLMS_OBJECT_TYPE CGXDLMSObjectDefinition::GetClassId()
-{
-    return m_ClassId;
-}
-
-void CGXDLMSObjectDefinition::SetClassId(DLMS_OBJECT_TYPE value)
-{
-    m_ClassId = value;
-}
-
-std::string CGXDLMSObjectDefinition::GetLogicalName()
-{
-    return m_LogicalName;
-}
-void CGXDLMSObjectDefinition::SetLogicalName(std::string value)
-{
-    m_LogicalName = value;
-}

@@ -57,6 +57,9 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_Count = 0;
     m_ProposedConformance = m_NegotiatedConformance = (DLMS_CONFORMANCE)0;
     m_ProtocolVersion = NULL;
+    m_QualityOfService = 0;
+    m_UserId = 0;
+    m_UseUtc2NormalTime = false;
 }
 
 //Destructor.
@@ -364,15 +367,33 @@ void CGXDLMSSettings::SetServiceClass(DLMS_SERVICE_CLASS value)
     m_ServiceClass = value;
 }
 
-int CGXDLMSSettings::GetInvokeID()
+unsigned char CGXDLMSSettings::GetInvokeID()
 {
     return m_InvokeID;
 }
 
-void CGXDLMSSettings::SetInvokeID(int value)
+void CGXDLMSSettings::SetInvokeID(unsigned char value)
 {
     m_InvokeID = value;
 }
+
+void CGXDLMSSettings::UpdateInvokeId(unsigned char value) {
+    if ((value & 0x80) != 0) {
+        m_Priority = DLMS_PRIORITY_HIGH;
+    }
+    else {
+        m_Priority = DLMS_PRIORITY_NORMAL;
+    }
+    if ((value & 0x40) != 0) {
+        m_ServiceClass = DLMS_SERVICE_CLASS_CONFIRMED;
+    }
+    else 
+    {
+        m_ServiceClass = DLMS_SERVICE_CLASS_UN_CONFIRMED;
+    }
+    m_InvokeID = (unsigned char)(value & 0xF);
+}
+
 
 unsigned long CGXDLMSSettings::GetLongInvokeID()
 {
@@ -531,10 +552,39 @@ void CGXDLMSSettings::SetProtocolVersion(const char* value)
     }
     if (value != NULL)
     {
-        int len = strlen(value);
+        short len = (short) strlen(value);
         m_ProtocolVersion = new char[len + 1];
         memcpy(m_ProtocolVersion, value, len);
         m_ProtocolVersion[len] = 0;
     }
 }
 
+bool CGXDLMSSettings::GetUseUtc2NormalTime()
+{
+    return m_UseUtc2NormalTime;
+}
+
+void CGXDLMSSettings::SetUseUtc2NormalTime(bool value)
+{
+    m_UseUtc2NormalTime = value;
+}
+
+unsigned char CGXDLMSSettings::GetUserID()
+{
+    return m_UserId;
+}
+
+void CGXDLMSSettings::SetUserID(unsigned char value)
+{
+    m_UserId = value;
+}
+
+unsigned char CGXDLMSSettings::GetQualityOfService()
+{
+    return m_QualityOfService;
+}
+
+void CGXDLMSSettings::SetQualityOfService(unsigned char value)
+{
+    m_QualityOfService = value;
+}

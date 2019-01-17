@@ -32,11 +32,18 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#include "../include/communication.h"
-#include "../../development/include/GXDLMSConverter.h"
-#include "../../development/include/GXDLMSProfileGeneric.h"
-#include "../../development/include/GXDLMSDemandRegister.h"
-#include "../../development/include/GXDLMSTranslator.h"
+#include <mbed.h>
+
+//---------------------------------------------------------------------------
+//Gurux framework includes
+//---------------------------------------------------------------------------
+#include "communication.h"
+#include "dlms/include/GXDLMSConverter.h"
+#include "dlms/include/GXDLMSProfileGeneric.h"
+#include "dlms/include/GXDLMSDemandRegister.h"
+#include "dlms/include/GXDLMSDemandRegister.h"
+
+RawSerial      pc(USBTX, USBRX);
 
 void CGXCommunication::WriteValue(GX_TRACE_LEVEL trace, std::string line)
 {
@@ -44,21 +51,12 @@ void CGXCommunication::WriteValue(GX_TRACE_LEVEL trace, std::string line)
     {
         printf(line.c_str());
     }
-    GXHelpers::Write("LogFile.txt", line);
 }
 
 
-CGXCommunication::CGXCommunication(CGXDLMSClient* pParser, int wt, GX_TRACE_LEVEL trace) :
-    m_WaitTime(wt), m_Parser(pParser),
-    m_socket(-1), m_Trace(trace)
+CGXCommunication::CGXCommunication(CGXDLMSClient* pParser, GX_TRACE_LEVEL trace) :
+    m_Parser(pParser), m_Trace(trace)
 {
-#if defined(_WIN32) || defined(_WIN64)//Windows includes
-    ZeroMemory(&m_osReader, sizeof(OVERLAPPED));
-    ZeroMemory(&m_osWrite, sizeof(OVERLAPPED));
-    m_osReader.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    m_osWrite.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-#endif
-    m_hComPort = INVALID_HANDLE_VALUE;
 }
 
 CGXCommunication::~CGXCommunication(void)
@@ -72,256 +70,26 @@ int CGXCommunication::Close()
     int ret;
     std::vector<CGXByteBuffer> data;
     CGXReplyData reply;
-    if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
+    if ((ret = m_Parser->ReleaseRequest(data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0)
     {
-        if ((ret = m_Parser->ReleaseRequest(data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0)
-        {
-            //Show error but continue close.
-        }
+        //Show error but continue close.
     }
-    if (m_hComPort != INVALID_HANDLE_VALUE || m_socket != -1)
+    if ((ret = m_Parser->DisconnectRequest(data)) != 0 ||
+        (ret = ReadDataBlock(data, reply)) != 0)
     {
-        if ((ret = m_Parser->DisconnectRequest(data)) != 0 ||
-            (ret = ReadDataBlock(data, reply)) != 0)
-        {
-            //Show error but continue close.
-        }
-    }
-    if (m_hComPort != INVALID_HANDLE_VALUE)
-    {
-#if defined(_WIN32) || defined(_WIN64)//Windows includes
-        CloseHandle(m_hComPort);
-        CloseHandle(m_osReader.hEvent);
-        CloseHandle(m_osWrite.hEvent);
-#else
-        close(m_hComPort);
-#endif
-        m_hComPort = INVALID_HANDLE_VALUE;
-    }
-    if (m_socket != -1)
-    {
-#if defined(_WIN32) || defined(_WIN64)//Windows includes
-        closesocket(m_socket);
-#else
-        close(m_socket);
-#endif
-        m_socket = -1;
+        //Show error but continue close.
     }
     return 0;
 }
 
-//Make TCP/IP connection to the meter.
-int CGXCommunication::Connect(const char* pAddress, unsigned short Port)
-{
-    Close();
-    //create socket.
-    m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    if (m_socket == -1)
-    {
-        assert(0);
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    sockaddr_in add;
-    add.sin_port = htons(Port);
-    add.sin_family = AF_INET;
-    add.sin_addr.s_addr = inet_addr(pAddress);
-    //If address is give as name
-    if (add.sin_addr.s_addr == INADDR_NONE)
-    {
-        hostent *Hostent = gethostbyname(pAddress);
-        if (Hostent == NULL)
-        {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-            int err = WSAGetLastError();
-#else
-            int err = errno;
-#endif
-            Close();
-            return err;
-        };
-        add.sin_addr = *(in_addr*)(void*)Hostent->h_addr_list[0];
-    };
-
-    //Connect to the meter.
-    int ret = connect(m_socket, (sockaddr*)&add, sizeof(sockaddr_in));
-    if (ret == -1)
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    };
-    return DLMS_ERROR_CODE_OK;
-}
-
-#if defined(_WIN32) || defined(_WIN64)//Windows
-int CGXCommunication::GXGetCommState(HANDLE hWnd, LPDCB dcb)
-{
-    ZeroMemory(dcb, sizeof(DCB));
-    dcb->DCBlength = sizeof(DCB);
-    if (!GetCommState(hWnd, dcb))
-    {
-        DWORD err = GetLastError(); //Save occured error.
-        if (err == 995)
-        {
-            COMSTAT comstat;
-            unsigned long RecieveErrors;
-            if (!ClearCommError(hWnd, &RecieveErrors, &comstat))
-            {
-                return GetLastError();
-            }
-            if (!GetCommState(hWnd, dcb))
-            {
-                return GetLastError(); //Save occured error.
-            }
-        }
-        else
-        {
-            //If USB to serial port converters do not implement this.
-            if (err != ERROR_INVALID_FUNCTION)
-            {
-                return err;
-            }
-        }
-    }
-    return DLMS_ERROR_CODE_OK;
-}
-
-int CGXCommunication::GXSetCommState(HANDLE hWnd, LPDCB DCB)
-{
-    if (!SetCommState(hWnd, DCB))
-    {
-        DWORD err = GetLastError(); //Save occured error.
-        if (err == 995)
-        {
-            COMSTAT comstat;
-            unsigned long RecieveErrors;
-            if (!ClearCommError(hWnd, &RecieveErrors, &comstat))
-            {
-                return GetLastError();
-            }
-            if (!SetCommState(hWnd, DCB))
-            {
-                return GetLastError();
-            }
-        }
-        else
-        {
-            //If USB to serial port converters do not implement this.
-            if (err != ERROR_INVALID_FUNCTION)
-            {
-                return err;
-            }
-        }
-    }
-    return DLMS_ERROR_CODE_OK;
-}
-
-#endif //Windows
-
 int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
 {
-#if defined(_WIN32) || defined(_WIN64)//Windows
-    unsigned long RecieveErrors;
-    COMSTAT comstat;
-    DWORD bytesRead = 0;
-#else //If Linux.
-    unsigned short bytesRead = 0;
-    int ret, readTime = 0;
-#endif
-    int pos;
-    unsigned long cnt = 1;
     bool bFound = false;
-    int lastReadIndex = 0;
+    int pos, lastReadIndex = 0;
     do
     {
-#if defined(_WIN32) || defined(_WIN64)//Windows
-        //We do not want to read byte at the time.
-        if (!ClearCommError(m_hComPort, &RecieveErrors, &comstat))
-        {
-            return DLMS_ERROR_CODE_SEND_FAILED;
-        }
-        bytesRead = 0;
-        cnt = 1;
-        //Try to read at least one byte.
-        if (comstat.cbInQue > 0)
-        {
-            cnt = comstat.cbInQue;
-        }
-        //If there is more data than can fit to buffer.
-        if (cnt > RECEIVE_BUFFER_SIZE)
-        {
-            cnt = RECEIVE_BUFFER_SIZE;
-        }
-        if (!ReadFile(m_hComPort, m_Receivebuff, cnt, &bytesRead, &m_osReader))
-        {
-            DWORD nErr = GetLastError();
-            if (nErr != ERROR_IO_PENDING)
-            {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
-            }
-            //Wait until data is actually read
-            if (::WaitForSingleObject(m_osReader.hEvent, m_WaitTime) != WAIT_OBJECT_0)
-            {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
-            }
-            if (!GetOverlappedResult(m_hComPort, &m_osReader, &bytesRead, TRUE))
-            {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
-            }
-        }
-#else
-        //Get bytes available.
-        ret = ioctl(m_hComPort, FIONREAD, &cnt);
-        //If driver is not supporting this functionality.
-        if (ret < 0)
-        {
-            cnt = RECEIVE_BUFFER_SIZE;
-        }
-        else if (cnt == 0)
-        {
-            //Try to read at least one byte.
-            cnt = 1;
-        }
-        //If there is more data than can fit to buffer.
-        if (cnt > RECEIVE_BUFFER_SIZE)
-        {
-            cnt = RECEIVE_BUFFER_SIZE;
-        }
-        bytesRead = read(m_hComPort, m_Receivebuff, cnt);
-        if (bytesRead == 0xFFFF)
-        {
-            //If wait time has elapsed.
-            if (errno == EAGAIN)
-            {
-                if (readTime > m_WaitTime)
-                {
-                    return DLMS_ERROR_CODE_RECEIVE_FAILED;
-                }
-                readTime += 100;
-                bytesRead = 0;
-            }
-            //If connection is closed.
-            else if (errno == EBADF)
-            {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
-            }
-            else
-            {
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
-            }
-        }
-#endif
-        reply.Set(m_Receivebuff, bytesRead);
-        //Note! Some USB converters can return true for ReadFile and Zero as bytesRead.
-        //In that case wait for a while and read again.
-        if (bytesRead == 0)
-        {
-#if defined(_WIN32) || defined(_WIN64)//Windows
-            Sleep(100);
-#else
-            usleep(100000);
-#endif
-            continue;
-        }
+        reply.SetUInt8(pc.getc());
         if (reply.GetSize() > 5)
         {
             //Some optical strobes can return extra bytes.
@@ -336,392 +104,6 @@ int CGXCommunication::Read(unsigned char eop, CGXByteBuffer& reply)
             lastReadIndex = pos;
         }
     } while (!bFound);
-    return DLMS_ERROR_CODE_OK;
-}
-
-//Open serial port.
-int CGXCommunication::Open(const char* settings, bool iec, int maxBaudrate)
-{
-    Close();
-    unsigned short baudRate;
-#if defined(_WIN32) || defined(_WIN64)
-    unsigned char parity;
-#else //Linux
-    int parity;
-#endif
-    unsigned char stopBits, dataBits = 8;
-    std::string port;
-    port = settings;
-    std::vector< std::string > tmp = GXHelpers::Split(port, ':');
-    std::string tmp2;
-    port.clear();
-    port = tmp[0];
-    if (tmp.size() > 1)
-    {
-        baudRate = atoi(tmp[1].c_str());
-        dataBits = atoi(tmp[2].substr(0, 1).c_str());
-        tmp2 = tmp[2].substr(1, tmp[2].size() - 2);
-        if (tmp2.compare("None") == 0)
-        {
-#if defined(_WIN32) || defined(_WIN64)
-            parity = NOPARITY;
-#else //Linux
-            parity = 0;
-#endif
-        }
-        else if (tmp2.compare("Odd") == 0)
-        {
-#if defined(_WIN32) || defined(_WIN64)
-            parity = ODDPARITY;
-#else //Linux
-            parity = PARENB | PARODD;
-#endif
-        }
-        else if (tmp2.compare("Even") == 0)
-        {
-#if defined(_WIN32) || defined(_WIN64)
-            parity = EVENPARITY;
-#else //Linux
-            parity = PARENB | PARENB;
-#endif
-        }
-        else if (tmp2.compare("Mark") == 0)
-        {
-#if defined(_WIN32) || defined(_WIN64)
-            parity = MARKPARITY;
-#else //Linux
-            parity = PARENB | PARODD | CMSPAR;
-#endif
-        }
-        else if (tmp2.compare("Space") == 0)
-        {
-#if defined(_WIN32) || defined(_WIN64)
-            parity = SPACEPARITY;
-#else //Linux
-            parity = PARENB | CMSPAR;
-#endif
-        }
-        else
-        {
-            printf("Invalid parity :\"%s\"\r\n", tmp2.c_str());
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        stopBits = atoi(tmp[2].substr(tmp[2].size() - 1, 1).c_str());
-    }
-    else
-    {
-#if defined(_WIN32) || defined(_WIN64)
-        baudRate = 9600;
-        parity = NOPARITY;
-        stopBits = ONESTOPBIT;
-#else
-        baudRate = B9600;
-        parity = 0;
-        stopBits = 0;
-#endif
-        dataBits = 8;
-    }
-
-    CGXByteBuffer reply;
-    int ret, len, pos;
-    unsigned char ch;
-    //In Linux serial port name might be very long.
-    char buff[50];
-#if defined(_WIN32) || defined(_WIN64)
-    DCB dcb = { 0 };
-    unsigned long sendSize = 0;
-#if _MSC_VER > 1000
-    sprintf_s(buff, 50, "\\\\.\\%s", port.c_str());
-#else
-    sprintf(buff, "\\\\.\\%s", port.c_str());
-#endif
-    //Open serial port for read / write. Port can't share.
-    m_hComPort = CreateFileA(buff,
-        GENERIC_READ | GENERIC_WRITE, 0, NULL,
-        OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-    if (m_hComPort == INVALID_HANDLE_VALUE)
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    dcb.DCBlength = sizeof(DCB);
-    if ((ret = GXGetCommState(m_hComPort, &dcb)) != 0)
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    dcb.fBinary = 1;
-    dcb.fOutX = dcb.fInX = 0;
-    //Abort all reads and writes on Error.
-    dcb.fAbortOnError = 1;
-    if (iec)
-    {
-        dcb.BaudRate = 300;
-        dcb.StopBits = ONESTOPBIT;
-        dcb.Parity = EVENPARITY;
-        dcb.ByteSize = 7;
-    }
-    else
-    {
-        dcb.BaudRate = baudRate;
-        dcb.ByteSize = dataBits;
-        dcb.StopBits = stopBits;
-        dcb.Parity = parity;
-    }
-    if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
-    {
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-#else //#if defined(__LINUX__)
-    struct termios options;
-    // read/write | not controlling term | don't wait for DCD line signal.
-    m_hComPort = open(port.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-    if (m_hComPort == -1) // if open is unsuccessful.
-    {
-        printf("Failed to Open port.\r");
-        return DLMS_ERROR_CODE_INVALID_PARAMETER;
-    }
-    else
-    {
-        if (!isatty(m_hComPort))
-        {
-            printf("Failed to Open port. This is not a serial port.\r");
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-
-        if ((ioctl(m_hComPort, TIOCEXCL) == -1))
-        {
-            printf("Failed to Open port. Exclusive access denied.\r");
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-
-        memset(&options, 0, sizeof(options));
-        options.c_iflag = 0;
-        options.c_oflag = 0;
-        if (iec)
-        {
-            options.c_cflag |= PARENB;
-            options.c_cflag &= ~PARODD;
-            options.c_cflag &= ~CSTOPB;
-            options.c_cflag &= ~CSIZE;
-            options.c_cflag |= CS7;
-            //Set Baud Rates
-            cfsetospeed(&options, B300);
-            cfsetispeed(&options, B300);
-        }
-        else
-        {
-            // 8n1, see termios.h for more information
-            options.c_cflag = CS8 | CREAD | CLOCAL;
-            options.c_cflag |= parity;
-            /*
-            options.c_cflag &= ~PARENB
-            options.c_cflag &= ~CSTOPB
-            options.c_cflag &= ~CSIZE;
-            options.c_cflag |= CS8;
-            */
-            //Set Baud Rates
-            cfsetospeed(&options, B9600);
-            cfsetispeed(&options, B9600);
-        }
-        options.c_lflag = 0;
-        options.c_cc[VMIN] = 1;
-        //How long we are waiting reply charachter from serial port.
-        options.c_cc[VTIME] = m_WaitTime / 1000;
-        //hardware flow control is used as default.
-        //options.c_cflag |= CRTSCTS;
-        if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
-        {
-            printf("Failed to Open port. tcsetattr failed.\r");
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-    }
-#endif
-    if (iec)
-    {
-#if _MSC_VER > 1000
-        strcpy_s(buff, 50, "/?!\r\n");
-#else
-        strcpy(buff, "/?!\r\n");
-#endif
-        len = (int)strlen(buff);
-        if (m_Trace > GX_TRACE_LEVEL_WARNING)
-        {
-            printf("\r\nTX: ");
-            for (pos = 0; pos != len; ++pos)
-            {
-                printf("%.2X ", buff[pos]);
-            }
-            printf("\r\n");
-        }
-#if defined(_WIN32) || defined(_WIN64)
-        ret = WriteFile(m_hComPort, buff, len, &sendSize, &m_osWrite);
-        if (ret == 0)
-        {
-            DWORD err = GetLastError();
-            //If error occurs...
-            if (err != ERROR_IO_PENDING)
-            {
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-            //Wait until data is actually sent
-            WaitForSingleObject(m_osWrite.hEvent, INFINITE);
-        }
-#else //#if defined(__LINUX__)
-        ret = write(m_hComPort, buff, len);
-        if (ret != len)
-        {
-            return DLMS_ERROR_CODE_SEND_FAILED;
-        }
-#endif
-        //Read reply data.
-        if (Read('\n', reply) != 0)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        //Remove echo.
-        if (reply.Compare((unsigned char*)buff, len))
-        {
-            if (Read('\n', reply) != 0)
-            {
-                return DLMS_ERROR_CODE_INVALID_PARAMETER;
-            }
-        }
-
-        if (m_Trace > GX_TRACE_LEVEL_WARNING)
-        {
-            printf("-> %s\r\n", reply.ToHexString().c_str());
-        }
-        if (reply.GetUInt8(&ch) != 0 || ch != '/')
-        {
-            return DLMS_ERROR_CODE_SEND_FAILED;
-        }
-        //Get used baud rate.
-        if ((ret = reply.GetUInt8(reply.GetPosition() + 3, &ch)) != 0)
-        {
-            return DLMS_ERROR_CODE_SEND_FAILED;
-        }
-        switch (ch)
-        {
-        case '0':
-#if defined(_WIN32) || defined(_WIN64)
-            baudRate = 300;
-#else
-            baudRate = B300;
-#endif
-            break;
-        case '1':
-#if defined(_WIN32) || defined(_WIN64)
-            baudRate = 600;
-#else
-            baudRate = B600;
-#endif
-            break;
-        case '2':
-#if defined(_WIN32) || defined(_WIN64)
-            baudRate = 1200;
-#else
-            baudRate = B1200;
-#endif
-            break;
-        case '3':
-#if defined(_WIN32) || defined(_WIN64)
-            baudRate = 2400;
-#else
-            baudRate = B2400;
-#endif
-            break;
-        case '4':
-#if defined(_WIN32) || defined(_WIN64)
-            baudRate = 4800;
-#else
-            baudRate = B4800;
-#endif
-            break;
-        case '5':
-#if defined(_WIN32) || defined(_WIN64)
-            baudRate = 9600;
-#else
-            baudRate = B9600;
-#endif
-            break;
-        case '6':
-#if defined(_WIN32) || defined(_WIN64)
-            baudRate = 19200;
-#else
-            baudRate = B19200;
-#endif
-            break;
-        default:
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        //Send ACK
-        buff[0] = 0x06;
-        //Send Protocol control character
-        buff[1] = '2';// "2" HDLC protocol procedure (Mode E)
-        buff[2] = (char)ch;
-        buff[3] = '2';
-        buff[4] = (char)0x0D;
-        buff[5] = 0x0A;
-        len = 6;
-        reply.Clear();
-        if (m_Trace > GX_TRACE_LEVEL_WARNING)
-        {
-            printf("\r\nTX: ");
-            for (pos = 0; pos != len; ++pos)
-            {
-                printf("%.2X ", buff[pos]);
-            }
-            printf("\r\n");
-        }
-#if defined(_WIN32) || defined(_WIN64)//Windows
-        ret = WriteFile(m_hComPort, buff, len, &sendSize, &m_osWrite);
-        if (ret == 0)
-        {
-            int err = GetLastError();
-            //If error occurs...
-            if (err != ERROR_IO_PENDING)
-            {
-                printf("WriteFile %d\r\n", err);
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-            //Wait until data is actually sent
-            WaitForSingleObject(m_osWrite.hEvent, INFINITE);
-        }
-#else //#if defined(__LINUX__)
-        ret = write(m_hComPort, buff, len);
-        if (ret != len)
-        {
-            return DLMS_ERROR_CODE_SEND_FAILED;
-        }
-#endif
-        //It's ok if this fails.
-        Read('\n', reply);
-#if defined(_WIN32) || defined(_WIN64)//Windows
-        dcb.BaudRate = baudRate;
-        printf("New baudrate %d\r\n", (int)dcb.BaudRate);
-        dcb.ByteSize = 8;
-        dcb.StopBits = ONESTOPBIT;
-        dcb.Parity = NOPARITY;
-        if ((ret = GXSetCommState(m_hComPort, &dcb)) != 0)
-        {
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        //Some meters need this sleep. Do not remove.
-        Sleep(1000);
-#else
-        // 8n1, see termios.h for more information
-        options.c_cflag = CS8 | CREAD | CLOCAL;
-        //Set Baud Rates
-        cfsetospeed(&options, baudRate);
-        cfsetispeed(&options, baudRate);
-        if (tcsetattr(m_hComPort, TCSAFLUSH, &options) != 0)
-        {
-            printf("Failed to Open port. tcsetattr failed.\r");
-            return DLMS_ERROR_CODE_INVALID_PARAMETER;
-        }
-        //Some meters need this sleep. Do not remove.
-        usleep(1000000);
-#endif
-    }
     return DLMS_ERROR_CODE_OK;
 }
 
@@ -773,10 +155,9 @@ int CGXCommunication::InitializeConnection()
 // Read DLMS Data frame from the device.
 int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
 {
-    int ret;
+    int ret, pos;
     CGXByteBuffer bb;
     std::string tmp;
-    CGXReplyData notify;
     if (data.GetSize() == 0)
     {
         return DLMS_ERROR_CODE_OK;
@@ -790,120 +171,30 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     }
     GXHelpers::Write("trace.txt", tmp + "\r\n");
     int len = data.GetSize();
-    if (m_hComPort != INVALID_HANDLE_VALUE)
+    //Send data.
+    for (pos = 0; pos != data.GetSize(); ++pos)
     {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-        DWORD sendSize = 0;
-        BOOL bRes = ::WriteFile(m_hComPort, data.GetData(), len, &sendSize, &m_osWrite);
-        if (!bRes)
-        {
-            COMSTAT comstat;
-            unsigned long RecieveErrors;
-            DWORD err = GetLastError();
-            //If error occurs...
-            if (err != ERROR_IO_PENDING)
-            {
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-            //Wait until data is actually sent
-            ret = WaitForSingleObject(m_osWrite.hEvent, m_WaitTime);
-            if (ret != 0)
-            {
-                DWORD err = GetLastError();
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-            //Read bytes in output buffer. Some USB converts require this.
-            if (!ClearCommError(m_hComPort, &RecieveErrors, &comstat))
-            {
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-        }
-#else //If Linux
-        ret = write(m_hComPort, data.GetData(), len);
-        if (ret != len)
-        {
-            printf("send failed %d\n", errno);
-            return DLMS_ERROR_CODE_SEND_FAILED;
-        }
-#endif
-    }
-    else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
-    {
-        //If error has occured
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-        printf("send failed %d\n", WSAGetLastError());
-#else
-        printf("send failed %d\n", errno);
-#endif
-        return DLMS_ERROR_CODE_SEND_FAILED;
+        pc.putc(data.GetData()[pos]);
     }
     // Loop until whole DLMS packet is received.
     tmp = "";
     do
     {
-        if (notify.GetData().GetSize() != 0)
+        if (Read(0x7E, bb) != 0)
         {
-            //Handle notify.
-            if (!notify.IsMoreData())
-            {
-                //Show received push message as XML.
-                std::string xml;
-                CGXDLMSTranslator t(DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML);
-                if ((ret = t.DataToXml(notify.GetData(), xml)) != 0)
-                {
-                    printf("ERROR! DataToXml failed.");
-                }
-                else
-                {
-                    printf("%s\r\n", xml.c_str());
-                }
-                notify.Clear();
-            }
-            continue;
+            return DLMS_ERROR_CODE_SEND_FAILED;
         }
-
-        if (m_hComPort != INVALID_HANDLE_VALUE)
+        if (tmp.size() == 0)
         {
-            if (Read(0x7E, bb) != 0)
-            {
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-            if (tmp.size() == 0)
-            {
-                Now(tmp);
-                tmp = "RX: " + tmp + "\t";
-            }
-            else
-            {
-                tmp += " ";
-            }
-            tmp += bb.ToHexString();
+            Now(tmp);
+            tmp = "RX: " + tmp + "\t";
         }
         else
         {
-            len = RECEIVE_BUFFER_SIZE;
-            if ((ret = recv(m_socket, (char*)m_Receivebuff, len, 0)) == -1)
-            {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-                printf("recv failed %d\n", WSAGetLastError());
-#else
-                printf("recv failed %d\n", errno);
-#endif
-                return DLMS_ERROR_CODE_RECEIVE_FAILED;
-            }
-            bb.Set(m_Receivebuff, ret);
-            if (tmp.size() == 0)
-            {
-                Now(tmp);
-                tmp = "RX: " + tmp + "\t";
-            }
-            else
-            {
-                tmp += " ";
-            }
-            tmp += GXHelpers::BytesToHex(m_Receivebuff, ret);
+            tmp += " ";
         }
-    } while ((ret = m_Parser->GetData(bb, reply, notify)) == DLMS_ERROR_CODE_FALSE);
+        tmp += bb.ToHexString();
+    } while ((ret = m_Parser->GetData(bb, reply)) == DLMS_ERROR_CODE_FALSE);
     tmp += "\r\n";
     if (m_Trace > GX_TRACE_LEVEL_INFO)
     {
@@ -912,11 +203,6 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     GXHelpers::Write("trace.txt", tmp);
     if (ret == DLMS_ERROR_CODE_REJECTED)
     {
-#if defined(_WIN32) || defined(_WIN64)//Windows
-        Sleep(1000);
-#else
-        usleep(1000000);
-#endif
         ret = ReadDLMSPacket(data, reply);
     }
     return ret;
@@ -950,7 +236,6 @@ int CGXCommunication::ReadDataBlock(CGXByteBuffer& data, CGXReplyData& reply)
     }
     return DLMS_ERROR_CODE_OK;
 }
-
 
 int CGXCommunication::ReadDataBlock(std::vector<CGXByteBuffer>& data, CGXReplyData& reply)
 {
@@ -1047,10 +332,6 @@ int CGXCommunication::ReadList(
     int ret;
     CGXReplyData reply;
     std::vector<CGXByteBuffer> data;
-    if (list.size() == 0)
-    {
-        return 0;
-    }
     //Get values from the meter.
     if ((ret = m_Parser->ReadList(list, data)) != 0)
     {
@@ -1187,7 +468,7 @@ int CGXCommunication::ReadRowsByEntry(
 
 int CGXCommunication::ReadScalerAndUnits()
 {
-    int ret;
+    int ret = 0;
     std::string str;
     std::string ln;
     std::vector<std::pair<CGXDLMSObject*, unsigned char> > list;
@@ -1311,7 +592,7 @@ int CGXCommunication::GetProfileGenericColumns()
 
 int CGXCommunication::GetReadOut()
 {
-    int ret;
+    int ret = 0;
     char buff[200];
     std::string value;
     for (std::vector<CGXDLMSObject*>::iterator it = m_Parser->GetObjects().begin(); it != m_Parser->GetObjects().end(); ++it)
@@ -1323,13 +604,6 @@ int CGXCommunication::GetReadOut()
             continue;
         }
 
-        if (dynamic_cast<CGXDLMSCustomObject*>((*it)) != NULL)
-        {
-            //If interface is not implemented.
-            //Example manufacturer specific interface.
-            printf("Unknown Interface: %d\r\n", (*it)->GetObjectType());
-            continue;
-        }
 #if _MSC_VER > 1000
         sprintf_s(buff, 200, "-------- Reading %s %s %s\r\n", CGXDLMSClient::ObjectTypeToString((*it)->GetObjectType()).c_str(), (*it)->GetName().ToString().c_str(), (*it)->GetDescription().c_str());
 #else
@@ -1362,9 +636,9 @@ int CGXCommunication::GetReadOut()
                 WriteValue(m_Trace, buff);
                 WriteValue(m_Trace, value.c_str());
                 WriteValue(m_Trace, "\r\n");
+                }
             }
         }
-    }
     return ret;
 }
 

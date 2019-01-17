@@ -1278,7 +1278,7 @@ CGXByteBuffer& CGXCipher::GetSystemTitle()
 void CGXCipher::SetSystemTitle(CGXByteBuffer& value)
 {
     m_SystemTitle.Clear();
-    m_SystemTitle.Set(&value);
+    m_SystemTitle.Set(value.GetData(), value.GetSize() - value.GetPosition());
 }
 
 CGXByteBuffer& CGXCipher::GetBlockCipherKey()
@@ -1289,7 +1289,7 @@ CGXByteBuffer& CGXCipher::GetBlockCipherKey()
 void CGXCipher::SetBlockCipherKey(CGXByteBuffer& value)
 {
     m_BlockCipherKey.Clear();
-    m_BlockCipherKey.Set(&value);
+    m_BlockCipherKey.Set(value.GetData(), value.GetSize() - value.GetPosition());
 }
 
 CGXByteBuffer& CGXCipher::GetAuthenticationKey()
@@ -1300,7 +1300,7 @@ CGXByteBuffer& CGXCipher::GetAuthenticationKey()
 void CGXCipher::SetAuthenticationKey(CGXByteBuffer& value)
 {
     m_AuthenticationKey.Clear();
-    m_AuthenticationKey.Set(&value);
+    m_AuthenticationKey.Set(value.GetData(), value.GetSize() - value.GetPosition());
 }
 
 unsigned long CGXCipher::GetFrameCounter()
@@ -1316,4 +1316,14 @@ void CGXCipher::SetFrameCounter(unsigned long value)
 void CGXCipher::Reset()
 {
 
+}
+
+CGXByteBuffer& CGXCipher::GetDedicatedKey()
+{
+    return m_DedicatedKey;
+}
+
+void CGXCipher::SetDedicatedKey(CGXByteBuffer& value)
+{
+    m_DedicatedKey = value;
 }
