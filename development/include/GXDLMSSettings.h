@@ -65,7 +65,7 @@ class CGXDLMSSettings
 
     // Is custom challenges used. If custom challenge is used new challenge is
     // not generated if it is Set. This is for debugging purposes.
-    bool m_CustomChallenges;
+    bool m_UseCustomChallenge;
 
     // Client to server challenge.
     CGXByteBuffer m_CtoSChallenge;
@@ -183,6 +183,16 @@ class CGXDLMSSettings
     // DLMS Standard says that Time zone is from normal time to UTC in minutes.
     // If meter is configured to use UTC time (UTC to normal time) set this to true.
     bool m_UseUtc2NormalTime;
+
+    /**
+     * Last executed command.
+     */
+    unsigned char m_Command;
+
+    /**
+     * Last executed command type
+     */
+    unsigned char m_CommandType;
 public:
     // Constructor.
     CGXDLMSSettings(bool isServer);
@@ -331,7 +341,7 @@ public:
     CGXDLMSObjectCollection& GetObjects();
 
     // Get Is custom challenges used.
-    bool IsCustomChallenges();
+    bool GetUseCustomChallenge();
 
     // Set is custom challenges used.
     void SetUseCustomChallenge(bool value);
@@ -485,6 +495,34 @@ public:
     void SetWindowSize(unsigned char value)
     {
         m_WindowSize = value;
+    }
+
+    /**
+     * the command
+     */
+    unsigned char GetCommand() {
+        return m_Command;
+    }
+
+    /**
+     * the command to set
+     */
+    void SetCommand(unsigned char value) {
+        m_Command = value;
+    }
+
+    /**
+     * Command Type
+     */
+    unsigned char GetCommandType() {
+        return m_CommandType;
+    }
+
+    /**
+     * Command Type
+     */
+    void SetCommandType(unsigned char value) {
+        m_CommandType = value;
     }
 };
 

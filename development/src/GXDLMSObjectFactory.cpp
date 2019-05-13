@@ -76,6 +76,8 @@
 #include "../include/GXDLMSCharge.h"
 #include "../include/GXDLMSParameterMonitor.h"
 #include "../include/GXDLMSTokenGateway.h"
+#include "../include/GXDLMSCompactData.h"
+#include "../include/GXDLMSUtilityTables.h"
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -161,7 +163,7 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_TCP_UDP_SETUP:
         return new CGXDLMSTcpUdpSetup();
     case DLMS_OBJECT_TYPE_UTILITY_TABLES:
-        return new CGXDLMSCustomObject(type);
+        return new CGXDLMSUtilityTables();
     case DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP:
         return new CGXDLMSMBusMasterPortSetup();
     case DLMS_OBJECT_TYPE_MESSAGE_HANDLER:
@@ -180,6 +182,8 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSParameterMonitor();
     case DLMS_OBJECT_TYPE_TOKEN_GATEWAY:
         return new CGXDLMSTokenGateway();
+    case DLMS_OBJECT_TYPE_COMPACT_DATA:
+        return new CGXDLMSCompactData();
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);
