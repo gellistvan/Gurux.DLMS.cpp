@@ -1732,6 +1732,7 @@ int CGXDLMS::HandleMethodResponse(
     {
         return ret;
     }
+    data.SetInvokeId(invoke);
     if (data.GetXml() != NULL)
     {
         std::string str;
@@ -1985,6 +1986,8 @@ int CGXDLMS::HandleSetResponse(
     {
         return ret;
     }
+    data.SetInvokeId(invokeId);
+
     if (data.GetXml() != NULL)
     {
         data.GetXml()->AppendStartTag(DLMS_COMMAND_SET_RESPONSE);
@@ -2723,6 +2726,8 @@ int CGXDLMS::HandleGetResponse(
     {
         return ret;
     }
+    reply.SetInvokeId(ch);
+
     if (reply.GetXml() != NULL)
     {
         reply.GetXml()->AppendStartTag(DLMS_COMMAND_GET_RESPONSE);
