@@ -319,7 +319,7 @@ public:
     /**
      * Invoke ID.
      */
-    void setInvokeId(long value)
+    void SetInvokeId(long value)
     {
         m_InvokeId = value;
     }
