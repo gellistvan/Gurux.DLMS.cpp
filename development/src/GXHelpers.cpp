@@ -1872,9 +1872,9 @@ static int SetDate(CGXByteBuffer& buff, CGXDLMSVariant& value)
         //If Sunday.
         if (val == 0)
         {
-            val = 8;
+            val = 7;
         }
-        buff.SetUInt8(val - 1);
+        buff.SetUInt8(val);
     }
     return 0;
 }
