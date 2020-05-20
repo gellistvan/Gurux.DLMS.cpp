@@ -73,7 +73,7 @@ CGXDLMSRegister::CGXDLMSRegister(std::string ln) :
 /// <summary>
 /// Get value of COSEM Data object.
 /// </summary>
-CGXDLMSVariant CGXDLMSRegister::GetValue()
+CGXDLMSVariant& CGXDLMSRegister::GetValue()
 {
     return m_Value;
 }
@@ -128,6 +128,14 @@ int CGXDLMSRegister::GetMethodCount()
     return 1;
 }
 
+int CGXDLMSRegister::Reset(
+    CGXDLMSClient* client,
+    std::vector<CGXByteBuffer>& reply)
+{
+    CGXDLMSVariant data((char)0);
+    return client->Method(this, 1, data, reply);
+}
+
 int CGXDLMSRegister::Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e)
 {
     if (e.GetIndex() == 1)
@@ -162,20 +170,20 @@ void CGXDLMSRegister::GetValues(std::vector<std::string>& values)
     values.push_back(str);
 }
 
-void CGXDLMSRegister::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSRegister::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //ScalerUnit
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //Value
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
@@ -264,8 +272,7 @@ int CGXDLMSRegister::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 2)
     {
-        CGXDLMSObject::SetDataType(2, e.GetValue().vt);
-        if (m_Scaler != 0)
+        if (m_Scaler != 0 && e.GetValue().IsNumber())
         {
             double val = GetScaler();
             val *= e.GetValue().ToDouble();

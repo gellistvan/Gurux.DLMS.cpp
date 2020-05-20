@@ -89,7 +89,7 @@ void CGXDLMSModemConfiguration::SetInitialisationStrings(std::vector<CGXDLMSMode
     m_InitialisationStrings = value;
 }
 
-std::vector< std::string > CGXDLMSModemConfiguration::GetModemProfile()
+std::vector< std::string >& CGXDLMSModemConfiguration::GetModemProfile()
 {
     return m_ModemProfile;
 }
@@ -137,40 +137,32 @@ void CGXDLMSModemConfiguration::GetValues(std::vector<std::string>& values)
     //Clear str.
     sb.str(std::string());
     sb << '[';
-    empty = true;
-    for (std::vector< std::string >::iterator it = m_ModemProfile.begin(); it != m_ModemProfile.end(); ++it)
-    {
-        if (!empty)
-        {
-            sb << ", ";
-        }
-        empty = false;
-        sb.write(it->c_str(), it->size());
-    }
+    GXHelpers::Join(", ", m_ModemProfile, ln);
+    sb << ln;
     sb << ']';
     values.push_back(sb.str());
 
 }
 
-void CGXDLMSModemConfiguration::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSModemConfiguration::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //CommunicationSpeed
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //InitialisationStrings
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //ModemProfile
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }

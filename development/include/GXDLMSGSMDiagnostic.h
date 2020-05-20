@@ -96,13 +96,13 @@ public:
     /**
     * @return Name of network operator.
     */
-    std::string GetOperator();
+    std::string& GetOperator();
 
     /**
     * @param value
     *            Name of network operator.
     */
-    void SetOperator(std::string value);
+    void SetOperator(std::string& value);
 
     /**
     * @return Registration status of the modem.
@@ -147,7 +147,7 @@ public:
     /**
     * @return Date and time when the data have been last captured.
     */
-    CGXDateTime GetCaptureTime();
+    CGXDateTime& GetCaptureTime();
 
     /**
     * @param value
@@ -164,7 +164,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

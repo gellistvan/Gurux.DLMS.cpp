@@ -189,16 +189,23 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
         }
-        if (tmp.vt == DLMS_DATA_TYPE_FLOAT32)
+        if (tmp.vt == DLMS_DATA_TYPE_FLOAT32 ||
+            tmp.vt == DLMS_DATA_TYPE_FLOAT64)
         {
-            snprintf(buff, 250, "%f", tmp.fltVal);
-            item->strVal = buff;
-            item->vt = type;
-            return DLMS_ERROR_CODE_OK;
-        }
-        if (tmp.vt == DLMS_DATA_TYPE_FLOAT64)
-        {
-            snprintf(buff, 250, "%lf", tmp.dblVal);
+            int ret = snprintf(buff, 250, tmp.vt == DLMS_DATA_TYPE_FLOAT32 ? "%f" : "%lf", tmp.vt == DLMS_DATA_TYPE_FLOAT32 ? tmp.fltVal : tmp.dblVal);
+            //Remove trailing zeroes.
+            while (ret > 0 && buff[ret - 1] == '0')
+            {
+                --ret;
+            }
+            if (ret > 0)
+            {
+                if (buff[ret - 1] == ',' || buff[ret - 1] == '.')
+                {
+                    --ret;
+                    buff[ret] = 0;
+                }
+            }
             item->strVal = buff;
             item->vt = type;
             return DLMS_ERROR_CODE_OK;
@@ -388,7 +395,7 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     int toSize = GetSize(type);
     //If we try to change bigger value to smaller check that value is not too big.
     //Example Int16 to Int8.
-    if (fromSize > toSize && tmp.vt != DLMS_DATA_TYPE_FLOAT32 && tmp.vt != DLMS_DATA_TYPE_FLOAT64)
+    if (fromSize > toSize&& tmp.vt != DLMS_DATA_TYPE_FLOAT32 && tmp.vt != DLMS_DATA_TYPE_FLOAT64)
     {
         unsigned char* pValue = &tmp.bVal;
         for (int pos = toSize; pos != fromSize; ++pos)
@@ -402,12 +409,12 @@ int CGXDLMSVariant::Convert(CGXDLMSVariant* item, DLMS_DATA_TYPE type)
     item->Clear();
     if (tmp.vt == DLMS_DATA_TYPE_FLOAT32)
     {
-        long long value = (long long) tmp.fltVal;
+        long long value = (long long)tmp.fltVal;
         memcpy(&item->bVal, &value, toSize);
     }
     else if (tmp.vt == DLMS_DATA_TYPE_FLOAT64)
     {
-        long long value = (long long) tmp.dblVal;
+        long long value = (long long)tmp.dblVal;
         memcpy(&item->bVal, &value, toSize);
     }
     else
@@ -611,6 +618,12 @@ CGXDLMSVariant::CGXDLMSVariant(unsigned short value)
 {
     vt = DLMS_DATA_TYPE_UINT16;
     uiVal = value;
+}
+
+CGXDLMSVariant::CGXDLMSVariant(unsigned int value)
+{
+    vt = DLMS_DATA_TYPE_UINT32;
+    ulVal = value;
 }
 
 CGXDLMSVariant::CGXDLMSVariant(unsigned long value)
@@ -1482,4 +1495,25 @@ int CGXDLMSVariant::GetBytes(CGXByteBuffer& value)
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     return 0;
+}
+
+bool CGXDLMSVariant::IsNumber()
+{
+    switch (vt)
+    {
+    case DLMS_DATA_TYPE_UINT8:
+    case DLMS_DATA_TYPE_UINT16:
+    case DLMS_DATA_TYPE_UINT32:
+    case DLMS_DATA_TYPE_UINT64:
+    case DLMS_DATA_TYPE_INT8:
+    case DLMS_DATA_TYPE_INT16:
+    case DLMS_DATA_TYPE_INT32:
+    case DLMS_DATA_TYPE_INT64:
+    case DLMS_DATA_TYPE_FLOAT32:
+    case DLMS_DATA_TYPE_FLOAT64:
+        return true;
+    default:
+        break;
+    }
+    return false;
 }

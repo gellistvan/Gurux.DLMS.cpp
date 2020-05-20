@@ -34,6 +34,10 @@
 #ifndef ERRORCODES_H
 #define ERRORCODES_H
 
+/////////////////////////////////////////////////////////////////////////////
+// Enumerates all DLMS error codes.
+// https://www.gurux.fi/Gurux.DLMS.ErrorCodes
+/////////////////////////////////////////////////////////////////////////////
 typedef enum
 {
     //Meter is not accept frame.
@@ -128,7 +132,8 @@ typedef enum
     DLMS_ERROR_CODE_AUTHENTICATION_MECHANISM_NAME_REQUIRED,
     DLMS_ERROR_CODE_AUTHENTICATION_FAILURE,
     DLMS_ERROR_CODE_AUTHENTICATION_REQUIRED,
-    DLMS_ERROR_CODE_INVALID_DATE_TIME
+    DLMS_ERROR_CODE_INVALID_DATE_TIME,
+    DLMS_ERROR_CODE_INVALID_INVOKE_ID
 }DLMS_ERROR_CODE;
 
 #endif //ERRORCODES_H

@@ -237,29 +237,17 @@ typedef enum
 
 typedef enum
 {
-    /// <summary>
-    /// Not defined
-    /// </summary>
+    // Not defined
     DLMS_CLOCK_BASE_NONE,
-    /// <summary>
-    /// Internal Crystal
-    /// </summary>
+    // Internal Crystal
     DLMS_CLOCK_BASE_CRYSTAL,
-    /// <summary>
-    /// Mains frequency 50 Hz,
-    /// </summary>
+    // Mains frequency 50 Hz,
     DLMS_CLOCK_BASE_FREQUENCY_50,
-    /// <summary>
-    /// Mains frequency 60 Hz,
-    /// </summary>
+    // Mains frequency 60 Hz,
     DLMS_CLOCK_BASE_FREQUENCY_60,
-    /// <summary>
-    /// Global Positioning System.
-    /// </summary>
+    // Global Positioning System.
     DLMS_CLOCK_BASE_GPS,
-    /// <summary>
-    /// Radio controlled.
-    /// </summary>
+    // Radio controlled.
     DLMS_CLOCK_BASE_RADIO
 } DLMS_CLOCK_BASE;
 
@@ -785,9 +773,14 @@ typedef enum
 
 typedef enum
 {
+    //All data is received.
     DLMS_DATA_REQUEST_TYPES_NONE = 0x0,
+    //Frame is available.
     DLMS_DATA_REQUEST_TYPES_FRAME = 0x1,
-    DLMS_DATA_REQUEST_TYPES_BLOCK = 0x2
+    //Block is available.
+    DLMS_DATA_REQUEST_TYPES_BLOCK = 0x2,
+    //General Block transfer data is available.
+    DLMS_DATA_REQUEST_TYPES_GBT = 0x4
 } DLMS_DATA_REQUEST_TYPES;
 
 typedef enum
@@ -826,9 +819,10 @@ typedef enum
     DLMS_OBJECT_TYPE_GPRS_SETUP = 45,
     DLMS_OBJECT_TYPE_SMTP_SETUP = 46,
     DLMS_OBJECT_TYPE_GSM_DIAGNOSTIC = 47,
+    DLMS_OBJECT_TYPE_IP6_SETUP = 48,
     DLMS_OBJECT_TYPE_REGISTER_TABLE = 61,
     DLMS_OBJECT_TYPE_STATUS_MAPPING = 63,
-    DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP = 64,
+    DLMS_OBJECT_TYPE_SECURITY_SETUP = 64,
     DLMS_OBJECT_TYPE_DISCONNECT_CONTROL = 70,
     DLMS_OBJECT_TYPE_LIMITER = 71,
     DLMS_OBJECT_TYPE_MBUS_CLIENT = 72,
@@ -839,20 +833,63 @@ typedef enum
     DLMS_OBJECT_TYPE_MBUS_MASTER_PORT_SETUP = 74,
 
     /*
-     * Configure a ZigBee PRO device with information necessary to create or
-     * join the network.
-     */
+    * Addresses that are provided by the base node during the opening of the
+    * convergence layer.
+    */
+    DLMS_OBJECT_TYPE_LLC_SSCS_SETUP = 80,
+
+    /*
+    * Counters related to the physical layers exchanges.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS = 81,
+
+    /*
+    * A necessary parameters to set up and manage the PRIME NB OFDM PLC MAC
+    * layer.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP = 82,
+
+    /*
+    * Functional behaviour of MAC.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS = 83,
+
+    /*
+    * Statistical information on the operation of the MAC layer for management
+    * purposes.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS = 84,
+
+    /*
+    * Parameters related to the management of the devices connected to the
+    * network.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA = 85,
+
+    /*
+    * Identification information related to administration and maintenance of
+    * PRIME NB OFDM PLC devices.
+    */
+    DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION = 86,
+
+    /*
+    * Configure a ZigBee PRO device with information necessary to create or
+    * join the network.
+    */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_STARTUP = 101,
 
     /*
-     * Configure the behavior of a ZigBee PRO device on joining or loss of
-     * connection to the network.
-     */
+    * Configure the behavior of a ZigBee PRO device on joining or loss of
+    * connection to the network.
+    */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_JOIN = 102,
+
     /*
-     * Configure the fragmentation feature of ZigBee PRO transport layer.
-     */
+    * Configure the fragmentation feature of ZigBee PRO transport layer.
+    */
     DLMS_OBJECT_TYPE_ZIG_BEE_SAS_APS_FRAGMENTATION = 103,
+
+
     DLMS_OBJECT_TYPE_ZIG_BEE_NETWORK_CONTROL = 104,
 
     DLMS_OBJECT_TYPE_ACCOUNT = 111,
@@ -1200,21 +1237,21 @@ typedef enum
 
 typedef enum
 {
-    /// <summary>
+
     /// No access.
-    /// </summary>
+
     DLMS_ACCESS_MODE_NONE = 0,
-    /// <summary>
+
     /// The client is allowed only reading from the server.
-    /// </summary>
+
     DLMS_ACCESS_MODE_READ = 1,
-    /// <summary>
+
     /// The client is allowed only writing to the server.
-    /// </summary>
+
     DLMS_ACCESS_MODE_WRITE = 2,
-    /// <summary>
+
     /// The client is allowed both reading from the server and writing to it.
-    /// </summary>
+
     DLMS_ACCESS_MODE_READ_WRITE = 3,
     DLMS_ACCESS_MODE_AUTHENTICATED_READ = 4,
     DLMS_ACCESS_MODE_AUTHENTICATED_WRITE = 5,
@@ -1223,17 +1260,17 @@ typedef enum
 
 typedef enum
 {
-    /// <summary>
+
     /// No access.
-    /// </summary>
+
     DLMS_METHOD_ACCESS_MODE_NONE = 0,
-    /// <summary>
+
     /// Access.
-    /// </summary>
+
     DLMS_METHOD_ACCESS_MODE_ACCESS = 1,
-    /// <summary>
+
     /// Authenticated Access.
-    /// </summary>
+
     DLMS_METHOD_ACCESS_MODE_AUTHENTICATED_ACCESS = 2
 } DLMS_METHOD_ACCESS_MODE;
 
@@ -1727,6 +1764,7 @@ typedef enum
 
 /*
 * Enumerates all conformance bits.
+* https://www.gurux.fi/Gurux.DLMS.Conformance
 */
 typedef enum
 {
@@ -2761,5 +2799,26 @@ typedef enum
      */
     DLMS_CHARGE_TYPE_PAYMENT_EVENT_BASED_COLLECTION
 }DLMS_CHARGE_TYPE;
+
+// Defines the weekdays.
+typedef enum
+{
+    /// No day of week is selected.
+    DLMS_WEEKDAYS_NONE = 0,
+    // Indicates Monday.
+    DLMS_WEEKDAYS_MONDAY = 0x80,
+    // Indicates Tuesday.
+    DLMS_WEEKDAYS_TUESDAY = 0x40,
+    // Indicates Wednesday.
+    DLMS_WEEKDAYS_WEDNESDAY = 0x20,
+    // Indicates Thursday.
+    DLMS_WEEKDAYS_THURSDAY = 0x10,
+    // Indicates Friday.
+    DLMS_WEEKDAYS_FRIDAY = 0x8,
+    // Indicates Saturday.
+    DLMS_WEEKDAYS_SATURDAY = 0x4,
+    // Indicates Sunday.
+    DLMS_WEEKDAYS_SUNDAY = 0x2
+}DLMS_WEEKDAYS;
 
 #endif //ENUMS_H

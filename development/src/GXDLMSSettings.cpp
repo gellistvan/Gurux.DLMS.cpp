@@ -48,6 +48,7 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_ServiceClass = DLMS_SERVICE_CLASS_UN_CONFIRMED;
     m_ClientAddress = 0;
     m_ServerAddress = 0;
+    m_PushClientAddress = 0;
     m_InterfaceType = DLMS_INTERFACE_TYPE_HDLC;
     m_Authentication = DLMS_AUTHENTICATION_NONE;
     m_MaxServerPDUSize = m_MaxReceivePDUSize = 0xFFFF;
@@ -60,6 +61,9 @@ CGXDLMSSettings::CGXDLMSSettings(bool isServer)
     m_QualityOfService = 0;
     m_UserId = 0;
     m_UseUtc2NormalTime = false;
+    m_BlockNumberAck = 0;
+    m_WindowSize = 1;
+    m_AutoIncreaseInvokeID = false;
 }
 
 //Destructor.
@@ -238,6 +242,7 @@ void CGXDLMSSettings::SetBlockIndex(unsigned long value)
 void CGXDLMSSettings::ResetBlockIndex()
 {
     m_BlockIndex = 1;
+    m_BlockNumberAck = 0;
 }
 
 void CGXDLMSSettings::IncreaseBlockIndex()
@@ -273,6 +278,16 @@ unsigned long CGXDLMSSettings::GetClientAddress()
 void CGXDLMSSettings::SetClientAddress(unsigned long value)
 {
     m_ClientAddress = value;
+}
+
+unsigned long CGXDLMSSettings::GetPushClientAddress()
+{
+    return m_PushClientAddress;
+}
+
+void CGXDLMSSettings::SetPushClientAddress(unsigned long value)
+{
+    m_PushClientAddress = value;
 }
 
 unsigned long CGXDLMSSettings::GetServerAddress()
@@ -581,4 +596,19 @@ unsigned char CGXDLMSSettings::GetQualityOfService()
 void CGXDLMSSettings::SetQualityOfService(unsigned char value)
 {
     m_QualityOfService = value;
+}
+
+/**
+ * @return Auto increase Invoke ID.
+ */
+bool CGXDLMSSettings::GetAutoIncreaseInvokeID() {
+    return m_AutoIncreaseInvokeID;
+}
+
+/**
+ * @param value
+ *            Auto increase Invoke ID.
+ */
+void CGXDLMSSettings::SetAutoIncreaseInvokeID(bool value) {
+    m_AutoIncreaseInvokeID = value;
 }

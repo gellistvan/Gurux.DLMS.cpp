@@ -56,8 +56,6 @@ class CGXDLMSObject : public IGXDLMSBase
     void Initialize(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer* pLogicalName);
     std::string m_Description;
     DLMS_OBJECT_TYPE m_ObjectType;
-    char m_AttributeIndex;
-    unsigned short m_DataIndex;
 protected:
     unsigned short m_Version;
     std::map<int, time_t> m_ReadTimes;
@@ -72,6 +70,7 @@ protected:
     bool CanRead(int index);
     static int GetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value);
     static int SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value);
+    static int SetLogicalName(CGXDLMSObject* target, std::string& value);
 public:
 
     static bool IsLogicalNameEmpty(unsigned char* pLN)
@@ -127,10 +126,10 @@ public:
 
 
     //Get description of the object.
-    std::string GetDescription();
+    std::string& GetDescription();
 
     //Set description of the object.
-    void SetDescription(std::string value);
+    void SetDescription(std::string& value);
 
     //Get values as std::string.
     virtual void GetValues(std::vector<std::string>& values)
@@ -138,9 +137,30 @@ public:
         assert(0);
     }
 
-    virtual void GetAttributeIndexToRead(std::vector<int>& attributes)
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    virtual void GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
     {
         assert(0);
+    }
+
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    virtual void GetAttributeIndexToRead(std::vector<int>& attributes)
+    {
+        GetAttributeIndexToRead(false, attributes);
     }
 
     // Returns amount of attributes.
