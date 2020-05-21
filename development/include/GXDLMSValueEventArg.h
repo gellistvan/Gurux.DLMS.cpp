@@ -174,6 +174,16 @@ private:
     CGXDLMSServer* GetServer();
 public:
     /**
+    * Constructor.
+    *
+    * @param index
+    *            Event index.
+    */
+    CGXDLMSValueEventArg(int index)
+    {
+      Init(NULL, NULL, index, 0);
+    }
+    /**
     * @return Target DLMS object.
     */
     CGXDLMSObject* GetTarget();
