@@ -65,6 +65,9 @@ public:
     //Get Security Setup security policy as a std::string.
     static const char* ToString(DLMS_SECURITY_POLICY value);
 
+    //Get Security Setup security policy v1 as a std::string.
+    static int ToString(DLMS_SECURITY_POLICY1 value, std::string& str);
+
     //Get Security Setup security suite as a std::string.
     static const char* ToString(DLMS_SECURITY_SUITE value);
 
@@ -109,5 +112,7 @@ public:
 
     //Convert object type enum value to string.
     static const char* ToString(DLMS_OBJECT_TYPE type);
+
+    static DLMS_OBJECT_TYPE ValueOfObjectType(const char* value);
 };
 #endif //GXDLMSCONVERTER_H

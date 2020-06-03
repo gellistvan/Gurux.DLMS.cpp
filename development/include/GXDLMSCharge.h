@@ -49,10 +49,10 @@ class CGXDLMSCharge : public CGXDLMSObject
     unsigned char m_Priority;
     CGXUnitCharge m_UnitChargeActive;
     CGXUnitCharge m_UnitChargePassive;
-    CGXTime m_UnitChargeActivationTime;
+    CGXDateTime m_UnitChargeActivationTime;
     unsigned long m_Period;
     std::string m_ChargeConfiguration;
-    CGXTime m_LastCollectionTime;
+    CGXDateTime m_LastCollectionTime;
     long m_LastCollectionAmount;
     long m_TotalAmountRemaining;
     unsigned short m_Proportion;
@@ -235,7 +235,7 @@ public:
      *
      * @return Last collection time.
      */
-    CGXDateTime GetLastCollectionTime()
+    CGXDateTime& GetLastCollectionTime()
     {
         return m_LastCollectionTime;
     }
@@ -330,9 +330,18 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
+    int GetUIDataType(int index, DLMS_DATA_TYPE& type);
 
     // Returns value of given attribute.
     int GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);

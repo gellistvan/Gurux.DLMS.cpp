@@ -38,6 +38,29 @@
 #include "GXDLMSObject.h"
 #include "GXDLMSCertificateInfo.h"
 
+//Global key types.
+typedef enum
+{
+    /**
+    * Global unicast encryption key. <br>
+    * Client and server uses this message to send Ephemeral Public Key to other
+    * party.
+    */
+    DLMS_GLOBAL_KEY_TYPE_UNICAST_ENCRYPTION,
+    /**
+     * Global broadcast encryption key.
+    */
+    DLMS_GLOBAL_KEY_TYPE_BROADCAST_ENCRYPTION,
+    /**
+     * Authentication key.
+    */
+    DLMS_GLOBAL_KEY_TYPE_AUTHENTICATION,
+    /**
+     * Key Encrypting Key, also known as Master key.
+    */
+    DLMS_GLOBAL_KEY_TYPE_KEK
+}DLMS_GLOBAL_KEY_TYPE;
+
 /**
 Online help:
 http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSecuritySetup
@@ -84,10 +107,24 @@ public:
     // Returns amount of methods.
     int GetMethodCount();
 
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    //Start to use new keys after reply is generated.
+    int ApplyKeys(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
@@ -99,5 +136,26 @@ public:
 
     //Get certificates.
     std::vector<CGXDLMSCertificateInfo*>& GetCertificates();
+
+
+    // Activates and strengthens the security policy.
+    // client: DLMS client that is used to generate action.
+    // security: New security level.
+    // reply: Generated action.
+    int Activate(
+        CGXDLMSClient* client,
+        DLMS_SECURITY security,
+        std::vector<CGXByteBuffer>& reply);
+
+    // Updates one or more global keys.
+    // client: DLMS client that is used to generate action.
+    // kek: Master key, also known as Key Encrypting Key.
+    // list: List of Global key types and keys.
+    // reply: Generated action.
+    int GlobalKeyTransfer(
+        CGXDLMSClient* client,
+        CGXByteBuffer& kek,
+        std::vector<std::pair<DLMS_GLOBAL_KEY_TYPE, CGXByteBuffer&> >& list,
+        std::vector<CGXByteBuffer>& reply);
 };
 #endif //GXDLMSDLMS_SECURITYSETUP_H

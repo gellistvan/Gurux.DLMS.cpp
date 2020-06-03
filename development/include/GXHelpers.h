@@ -91,6 +91,15 @@ public:
     * type : Data type.
     * value : Added Value.
     */
+    static int SetData2(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant value);
+
+    /**
+    * Convert object to DLMS bytes.
+    *
+    * buff : Byte buffer where data is write.
+    * type : Data type.
+    * value : Added Value.
+    */
     static int SetData(CGXByteBuffer& buff, DLMS_DATA_TYPE type, CGXDLMSVariant& value);
 
     /**
@@ -212,5 +221,7 @@ public:
 
     //Convert int value to string.
     static std::string IntToString(int value);
+    //Join list of strings to one string.
+    static void Join(std::string separator, std::vector< std::string >& list, std::string& res);
 };
 #endif //GXHELPERS_H

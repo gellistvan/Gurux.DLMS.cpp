@@ -51,16 +51,16 @@ CGXDLMSAutoAnswer::CGXDLMSAutoAnswer(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_ANSWER, ln, sn)
 {
     m_NumberOfRingsInListeningWindow = m_NumberOfRingsOutListeningWindow = 0;
-    m_Mode = AUTO_CONNECT_MODE_NO_AUTO_DIALLING;
+    m_Mode = DLMS_AUTO_ANSWER_MODE_DEVICE;
     m_Status = AUTO_ANSWER_STATUS_INACTIVE;
     m_NumberOfCalls = 0;
 }
 
-AUTO_CONNECT_MODE CGXDLMSAutoAnswer::GetMode()
+DLMS_AUTO_ANSWER_MODE CGXDLMSAutoAnswer::GetMode()
 {
     return m_Mode;
 }
-void CGXDLMSAutoAnswer::SetMode(AUTO_CONNECT_MODE value)
+void CGXDLMSAutoAnswer::SetMode(DLMS_AUTO_ANSWER_MODE value)
 {
     m_Mode = value;
 }
@@ -159,36 +159,36 @@ void CGXDLMSAutoAnswer::GetValues(std::vector<std::string>& values)
     values.push_back(sb.str());
 }
 
-void CGXDLMSAutoAnswer::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSAutoAnswer::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //Mode is static and read only once.
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //ListeningWindow is static and read only once.
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //Status is not static.
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
 
     //NumberOfCalls is static and read only once.
-    if (!IsRead(5))
+    if (all || !IsRead(5))
     {
         attributes.push_back(5);
     }
     //NumberOfRingsInListeningWindow is static and read only once.
-    if (!IsRead(6))
+    if (all || !IsRead(6))
     {
         attributes.push_back(6);
     }
@@ -315,7 +315,7 @@ int CGXDLMSAutoAnswer::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg&
     }
     if (e.GetIndex() == 2)
     {
-        SetMode((AUTO_CONNECT_MODE)e.GetValue().lVal);
+        SetMode((DLMS_AUTO_ANSWER_MODE)e.GetValue().lVal);
         return DLMS_ERROR_CODE_OK;
     }
     if (e.GetIndex() == 3)

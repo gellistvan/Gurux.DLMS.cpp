@@ -67,11 +67,10 @@ class CGXDLMSTranslator
     // If only PDUs are shown and PDU is received on parts.
     CGXByteBuffer m_PduFrames;
 
-    int PduToXml(CGXByteBuffer& value, bool omitDeclaration, bool omitNameSpace, std::string &output);
+    int PduToXml(CGXByteBuffer& value, bool omitDeclaration, bool omitNameSpace, std::string& output);
 
-    int PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& value, bool omitDeclaration, bool omitNameSpace, bool allowUnknownCommand, std::string &output);
-    void GetCiphering(CGXDLMSSettings& settings);
-
+    int PduToXml(CGXDLMSTranslatorStructure* xml, CGXByteBuffer& value, bool omitDeclaration, bool omitNameSpace, bool allowUnknownCommand, std::string& output);
+    void GetCiphering(CGXDLMSSettings& settings, bool force);
 public:
     // Are comments added.
     bool GetComments();
@@ -120,6 +119,11 @@ public:
     CGXByteBuffer m_ServerSystemTitle;
 
     /**
+    * Dedicated key.
+    */
+    CGXByteBuffer m_DedicatedKey;
+
+    /**
     * Is data encrypted.
     */
     bool m_Encrypt;
@@ -138,15 +142,15 @@ public:
      */
     unsigned long m_FrameCounter;
 
-    /// <summary>
-      /// Get all tags.
-      /// </summary>
-      /// <param name="type">Output type.</param>
-      /// <param name="list">List of tags by ID.</param>
-      /// <param name="tagsByName">List of tags by name.</param>
+    /*
+    * Get all tags.
+    * type: Output type.
+    * list: List of tags by ID.
+    * tagsByName: List of tags by name.
+    */
     static void GetTags(DLMS_TRANSLATOR_OUTPUT_TYPE type,
-        std::map<unsigned long, std::string> &list,
-        std::map<std::string, unsigned long> &tagsByName)
+        std::map<unsigned long, std::string>& list,
+        std::map<std::string, unsigned long>& tagsByName)
     {
         if (type == DLMS_TRANSLATOR_OUTPUT_TYPE_SIMPLE_XML)
         {
@@ -210,6 +214,28 @@ public:
     */
     void SetSystemTitle(CGXByteBuffer& value);
 
+
+    /*
+     * Returns System title.
+     */
+    CGXByteBuffer& GetServerSystemTitle();
+
+    /*
+    *  value: System title.
+    */
+    void SetServerSystemTitle(CGXByteBuffer& value);
+
+    /*
+     * Returns dedicated key.
+    */
+    CGXByteBuffer& GetDedicatedKey();
+
+    /*
+    *  value: Dedicated ky.
+    */
+    void SetDedicatedKey(CGXByteBuffer& value);
+
+
     /**
      * @return Block cipher key.
      */
@@ -241,7 +267,7 @@ public:
     // Convert bytes to xml.
     // value: Bytes to convert.
     // Returns Converted xml.
-    int PduToXml(CGXByteBuffer& value, std::string &output)
+    int PduToXml(CGXByteBuffer& value, std::string& output)
     {
         return PduToXml(value, m_OmitXmlDeclaration, m_OmitXmlNameSpace, output);
     }

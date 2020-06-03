@@ -291,56 +291,56 @@ void CGXDLMSActivityCalendar::GetValues(std::vector<std::string>& values)
     values.push_back(m_Time.ToString());
 }
 
-void CGXDLMSActivityCalendar::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSActivityCalendar::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //CalendarNameActive
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
     //SeasonProfileActive
-    if (CanRead(3))
+    if (all || CanRead(3))
     {
         attributes.push_back(3);
     }
 
     //WeekProfileTableActive
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     //DayProfileTableActive
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }
     //CalendarNamePassive
-    if (CanRead(6))
+    if (all || CanRead(6))
     {
         attributes.push_back(6);
     }
     //SeasonProfilePassive
-    if (CanRead(7))
+    if (all || CanRead(7))
     {
         attributes.push_back(7);
     }
     //WeekProfileTablePassive
-    if (CanRead(8))
+    if (all || CanRead(8))
     {
         attributes.push_back(8);
     }
     //DayProfileTablePassive
-    if (CanRead(9))
+    if (all || CanRead(9))
     {
         attributes.push_back(9);
     }
     //Time.
-    if (CanRead(10))
+    if (all || CanRead(10))
     {
         attributes.push_back(10);
     }
@@ -413,13 +413,11 @@ int GetSeasonProfile(std::vector<CGXDLMSSeasonProfile*>& items, CGXByteBuffer& d
     {
         data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
         data.SetUInt8(3);
-        tmp.Clear();
-        tmp.Add((*it)->GetName());
+        tmp = (*it)->GetName();
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
         tmp = (*it)->GetStart();
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
-        tmp.Clear();
-        tmp.Add((*it)->GetWeekName());
+        tmp = (*it)->GetWeekName();
         GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, tmp);
     }
     return 0;
@@ -573,19 +571,21 @@ void AddSeasonProfile(std::vector<CGXDLMSSeasonProfile*>& items, std::vector<CGX
         delete *item;
     }
     items.clear();
-    std::string name;
+    CGXByteBuffer bb;
     CGXDLMSVariant tmp;
     for (std::vector<CGXDLMSVariant>::iterator item = list.begin(); item != list.end(); ++item)
     {
         CGXDLMSSeasonProfile *it = new CGXDLMSSeasonProfile();
-        name.clear();
-        name.append((*item).Arr[0].byteArr, (*item).Arr[0].byteArr + (*item).Arr[0].GetSize());
-        it->SetName(name);
+        bb.Clear();
+        bb.Set(item->Arr[0].byteArr, item->Arr[0].GetSize());
+        it->SetName(bb);
+        tmp.Clear();
         CGXDLMSClient::ChangeType((*item).Arr[1], DLMS_DATA_TYPE_DATETIME, tmp);
         it->SetStart(tmp.dateTime);
-        name.clear();
-        name.append((*item).Arr[2].byteArr, (*item).Arr[2].byteArr + (*item).Arr[2].GetSize());
-        it->SetWeekName(name);
+        tmp.Clear();
+        bb.Clear();
+        bb.Set(item->Arr[2].byteArr, item->Arr[2].GetSize());
+        it->SetWeekName(bb);
         items.push_back(it);
     }
 }
@@ -597,14 +597,14 @@ void AddWeekProfileTable(std::vector<CGXDLMSWeekProfile*>& items, std::vector<CG
         delete *item;
     }
     items.clear();
-    std::string name;
+    CGXByteBuffer bb;
     for (std::vector<CGXDLMSVariant>::iterator item = list.begin(); item != list.end(); ++item)
     {
         CGXDLMSVariant tmp;
         CGXDLMSWeekProfile *it = new CGXDLMSWeekProfile();
-        name.clear();
-        name.append((*item).Arr[0].byteArr, (*item).Arr[0].byteArr + (*item).Arr[0].GetSize());
-        it->SetName(name);
+        bb.Clear();
+        bb.Set(item->Arr[0].byteArr, item->Arr[0].GetSize());
+        it->SetName(bb);
         it->SetMonday((*item).Arr[1].lVal);
         it->SetTuesday((*item).Arr[2].lVal);
         it->SetWednesday((*item).Arr[3].lVal);

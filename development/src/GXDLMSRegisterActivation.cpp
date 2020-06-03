@@ -134,25 +134,25 @@ void CGXDLMSRegisterActivation::GetValues(std::vector<std::string>& values)
     }
 }
 
-void CGXDLMSRegisterActivation::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSRegisterActivation::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //RegisterAssignment
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //MaskList
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //ActiveMask
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }
@@ -208,7 +208,7 @@ int CGXDLMSRegisterActivation::GetValue(CGXDLMSSettings& settings, CGXDLMSValueE
             GXHelpers::SetLogicalName(it->GetLogicalName().c_str(), ln);
             data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
             data.SetUInt8(2);
-            id = it->GetClassId();
+            id = it->GetObjectType();
             if ((ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_UINT16, id)) != 0 ||
                 (ret = GXHelpers::SetData(data, DLMS_DATA_TYPE_OCTET_STRING, ln)) != 0)
             {
@@ -269,7 +269,7 @@ int CGXDLMSRegisterActivation::SetValue(CGXDLMSSettings& settings, CGXDLMSValueE
             for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
             {
                 CGXDLMSObjectDefinition item;
-                item.SetClassId((DLMS_OBJECT_TYPE)it->Arr[0].ToInteger());
+                item.SetObjectType((DLMS_OBJECT_TYPE)it->Arr[0].ToInteger());
                 std::string ln;
                 GXHelpers::GetLogicalName(it->Arr[1].byteArr, ln);
                 item.SetLogicalName(ln);

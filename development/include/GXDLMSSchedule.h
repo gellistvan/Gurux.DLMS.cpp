@@ -44,7 +44,9 @@ http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSSchedule
 */
 class CGXDLMSSchedule : public CGXDLMSObject
 {
-    std::vector<CGXDLMSScheduleEntry> m_Entries;
+    std::vector<CGXDLMSScheduleEntry*> m_Entries;
+    int RemoveEntry(unsigned short index);
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 public:
     //Constructor.
     CGXDLMSSchedule();
@@ -55,11 +57,46 @@ public:
     //LN Constructor.
     CGXDLMSSchedule(std::string ln);
 
+    //Destructor.
+    ~CGXDLMSSchedule();
+
+    //
+    // Add entry to entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entry.
+    // reply: Action bytes.
+    int Insert(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
+
+    //
+    // Remove entry from entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entry.
+    // reply: Action bytes.
+    int Delete(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
+
+    //
+    // Enable entry from entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entry.
+    // reply: Action bytes.
+    int Enable(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
+
+    //
+    // Disable entry from entries list.
+    //
+    // client: DLMS client.
+    // entry: Schedule entries.
+    // reply: Action bytes.
+    int Disable(CGXDLMSClient* client, CGXDLMSScheduleEntry* entry, std::vector<CGXByteBuffer>& reply);
+
     // Get value of COSEM Data object.
-    std::vector<CGXDLMSScheduleEntry>& GetEntries();
+    std::vector<CGXDLMSScheduleEntry*>& GetEntries();
 
     // Set value of COSEM Data object.
-    void SetEntries(std::vector<CGXDLMSScheduleEntry>& value);
+    void SetEntries(std::vector<CGXDLMSScheduleEntry*>& value);
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -70,7 +107,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

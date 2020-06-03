@@ -74,7 +74,7 @@ public:
     std::vector<CGXDLMSModemInitialisation>& GetInitialisationStrings();
     void SetInitialisationStrings(std::vector<CGXDLMSModemInitialisation>& value);
 
-    std::vector< std::string > GetModemProfile();
+    std::vector< std::string >& GetModemProfile();
     void SetModemProfile(std::vector< std::string >& value);
 
     // Returns amount of attributes.
@@ -86,7 +86,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

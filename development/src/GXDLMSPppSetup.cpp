@@ -170,30 +170,30 @@ void CGXDLMSPppSetup::GetValues(std::vector<std::string>& values)
     values.push_back(str);
 }
 
-void CGXDLMSPppSetup::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSPppSetup::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //PHYReference
-    if (!IsRead(2))
+    if (all || !IsRead(2))
     {
         attributes.push_back(2);
     }
     //LCPOptions
-    if (!IsRead(3))
+    if (all || !IsRead(3))
     {
         attributes.push_back(3);
     }
     //IPCPOptions
-    if (!IsRead(4))
+    if (all || !IsRead(4))
     {
         attributes.push_back(4);
     }
     //PPPAuthentication
-    if (!IsRead(5))
+    if (all || !IsRead(5))
     {
         attributes.push_back(5);
     }
@@ -219,7 +219,14 @@ int CGXDLMSPppSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
     }
     else if (index == 5)
     {
-        type = DLMS_DATA_TYPE_STRUCTURE;
+        if (m_UserName.GetSize() == 0)
+        {
+            type = DLMS_DATA_TYPE_NONE;
+        }
+        else
+        {
+            type = DLMS_DATA_TYPE_STRUCTURE;
+        }
     }
     else
     {
@@ -291,18 +298,21 @@ int CGXDLMSPppSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     }
     else if (e.GetIndex() == 5)
     {
-        e.SetByteArray(true);
-        data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
-        data.SetUInt8(2);
-        //Add username.
-        data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
-        data.SetUInt8((unsigned char)m_UserName.GetSize());
-        data.Set(&m_UserName, 0, -1);
-        //Add password.
-        data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
-        data.SetUInt8((unsigned char)m_Password.GetSize());
-        data.Set(&m_Password, 0, -1);
-        e.SetValue(data);
+        if (m_UserName.GetSize() != 0)
+        {
+            e.SetByteArray(true);
+            data.SetUInt8(DLMS_DATA_TYPE_STRUCTURE);
+            data.SetUInt8(2);
+            //Add username.
+            data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+            data.SetUInt8((unsigned char)m_UserName.GetSize());
+            data.Set(&m_UserName, 0, -1);
+            //Add password.
+            data.SetUInt8(DLMS_DATA_TYPE_OCTET_STRING);
+            data.SetUInt8((unsigned char)m_Password.GetSize());
+            data.Set(&m_Password, 0, -1);
+            e.SetValue(data);
+        }
         return DLMS_ERROR_CODE_OK;
     }
     return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -360,8 +370,15 @@ int CGXDLMSPppSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e
     {
         m_UserName.Clear();
         m_Password.Clear();
-        m_UserName.Set(e.GetValue().Arr[0].byteArr, e.GetValue().Arr[0].size);
-        m_Password.Set(e.GetValue().Arr[1].byteArr, e.GetValue().Arr[1].size);
+        if (e.GetValue().Arr.size() == 2)
+        {
+            m_UserName.Set(e.GetValue().Arr[0].byteArr, e.GetValue().Arr[0].size);
+            m_Password.Set(e.GetValue().Arr[1].byteArr, e.GetValue().Arr[1].size);
+        }
+        else if (e.GetValue().Arr.size() != 0)
+        {
+            return DLMS_ERROR_CODE_INVALID_PARAMETER;
+        }
     }
     else
     {

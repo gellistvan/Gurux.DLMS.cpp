@@ -112,7 +112,7 @@ public:
     CGXDLMSVariant(std::string value);
     CGXDLMSVariant(CGXByteBuffer& value);
     CGXDLMSVariant(const char* value);
-
+    CGXDLMSVariant(unsigned int value);
     //Destructor.
     ~CGXDLMSVariant();
 
@@ -152,5 +152,8 @@ public:
     int ToInteger();
     double ToDouble();
     int GetBytes(CGXByteBuffer& value);
+
+    //Returns true if value is number.
+    bool IsNumber();
 };
 #endif //GXDLMSVARIANT_H

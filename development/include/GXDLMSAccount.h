@@ -175,6 +175,8 @@ class CGXDLMSAccount : public CGXDLMSObject
      * http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSAccount
      */
     int m_MaxProvisionPeriod;
+
+    int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 public:
     //Constructor.
     CGXDLMSAccount();
@@ -372,7 +374,7 @@ public:
      *
      * @return Credit references.
      */
-    std::vector<std::string>& getCreditReferences()
+    std::vector<std::string>& GetCreditReferences()
     {
         return m_CreditReferences;
     }
@@ -614,7 +616,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 
@@ -623,5 +633,23 @@ public:
 
     // Set value of given attribute.
     int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Activate the account value.
+    int Activate(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Close the account value.
+    int Close(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
+    /////////////////////////////////////////////////////////////////////////
+    //Reset the account value.
+    int Reset(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
 };
 #endif //GXACCOUNT_H

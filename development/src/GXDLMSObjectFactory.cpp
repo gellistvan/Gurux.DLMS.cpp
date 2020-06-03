@@ -63,6 +63,7 @@
 #include "../include/GXDLMSHdlcSetup.h"
 #include "../include/GXDLMSIECOpticalPortSetup.h"
 #include "../include/GXDLMSIp4Setup.h"
+//#include "../include/GXDLMSIp6Setup.h"
 #include "../include/GXDLMSRegisterActivation.h"
 #include "../include/GXDLMSSchedule.h"
 #include "../include/GXDLMSModemConfiguration.h"
@@ -78,6 +79,13 @@
 #include "../include/GXDLMSTokenGateway.h"
 #include "../include/GXDLMSCompactData.h"
 #include "../include/GXDLMSUtilityTables.h"
+#include "../include/GXDLMSLlcSscsSetup.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcPhysicalLayerCounters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacSetup.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacFunctionalParameters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
+#include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -108,16 +116,18 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSExtendedRegister();
     case DLMS_OBJECT_TYPE_GPRS_SETUP:
         return new CGXDLMSGPRSSetup();
-    case DLMS_OBJECT_TYPE_DLMS_SECURITY_SETUP:
+    case DLMS_OBJECT_TYPE_SECURITY_SETUP:
         return new CGXDLMSSecuritySetup();
     case DLMS_OBJECT_TYPE_IEC_HDLC_SETUP:
         return new CGXDLMSIecHdlcSetup();
     case DLMS_OBJECT_TYPE_IEC_LOCAL_PORT_SETUP:
-        return new CGXDLMSIECOpticalPortSetup();
+        return new CGXDLMSIECLocalPortSetup();
     case DLMS_OBJECT_TYPE_IEC_TWISTED_PAIR_SETUP:
         return new CGXDLMSCustomObject(type);
     case DLMS_OBJECT_TYPE_IP4_SETUP:
         return new CGXDLMSIp4Setup();
+//    case DLMS_OBJECT_TYPE_IP6_SETUP:
+//        return new CGXDLMSIp6Setup();
     case DLMS_OBJECT_TYPE_MBUS_SLAVE_PORT_SETUP:
         return new CGXDLMSMBusSlavePortSetup();
     case DLMS_OBJECT_TYPE_IMAGE_TRANSFER:
@@ -184,6 +194,20 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSTokenGateway();
     case DLMS_OBJECT_TYPE_COMPACT_DATA:
         return new CGXDLMSCompactData();
+    case DLMS_OBJECT_TYPE_LLC_SSCS_SETUP:
+        return new CGXDLMSLlcSscsSetup();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_PHYSICAL_LAYER_COUNTERS:
+        return new CGXDLMSPrimeNbOfdmPlcPhysicalLayerCounters();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_SETUP:
+        return new CGXDLMSPrimeNbOfdmPlcMacSetup();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_FUNCTIONAL_PARAMETERS:
+        return new CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_COUNTERS:
+        return new CGXDLMSPrimeNbOfdmPlcMacCounters();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_MAC_NETWORK_ADMINISTRATION_DATA:
+        return new CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData();
+    case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
+        return new CGXDLMSPrimeNbOfdmPlcApplicationsIdentification();
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);

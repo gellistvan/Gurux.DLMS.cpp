@@ -47,8 +47,9 @@ CGXDLMSAutoConnect::CGXDLMSAutoConnect() :
 CGXDLMSAutoConnect::CGXDLMSAutoConnect(std::string ln, unsigned short sn) :
     CGXDLMSObject(DLMS_OBJECT_TYPE_AUTO_CONNECT, ln, sn)
 {
-    m_Mode = AUTO_CONNECT_MODE_NO_AUTO_DIALLING;
+    m_Mode = DLMS_AUTO_CONNECT_MODE_NO_AUTO_CONNECT;
     m_RepetitionDelay = m_Repetitions = 0;
+    m_Version = 2;
 }
 
 //LN Constructor.
@@ -57,11 +58,11 @@ CGXDLMSAutoConnect::CGXDLMSAutoConnect(std::string ln) :
 {
 }
 
-AUTO_CONNECT_MODE CGXDLMSAutoConnect::GetMode()
+DLMS_AUTO_CONNECT_MODE CGXDLMSAutoConnect::GetMode()
 {
     return m_Mode;
 }
-void CGXDLMSAutoConnect::SetMode(AUTO_CONNECT_MODE value)
+void CGXDLMSAutoConnect::SetMode(DLMS_AUTO_CONNECT_MODE value)
 {
     m_Mode = value;
 }
@@ -166,35 +167,35 @@ void CGXDLMSAutoConnect::GetValues(std::vector<std::string>& values)
     values.push_back(sb.str());
 }
 
-void CGXDLMSAutoConnect::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSAutoConnect::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //Mode
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
     //Repetitions
-    if (CanRead(3))
+    if (all || CanRead(3))
     {
         attributes.push_back(3);
     }
     //RepetitionDelay
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     //CallingWindow
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }
     //Destinations
-    if (CanRead(6))
+    if (all || CanRead(6))
     {
         attributes.push_back(6);
     }
@@ -325,7 +326,7 @@ int CGXDLMSAutoConnect::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg
     }
     else if (e.GetIndex() == 2)
     {
-        SetMode((AUTO_CONNECT_MODE)e.GetValue().ToInteger());
+        SetMode((DLMS_AUTO_CONNECT_MODE)e.GetValue().ToInteger());
         return DLMS_ERROR_CODE_OK;
     }
     else if (e.GetIndex() == 3)

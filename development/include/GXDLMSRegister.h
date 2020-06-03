@@ -65,7 +65,7 @@ public:
     /// <summary>
     /// Get value of COSEM Data object.
     /// </summary>
-    CGXDLMSVariant GetValue();
+    CGXDLMSVariant& GetValue();
 
     /// <summary>
     /// Set value of COSEM Data object.
@@ -75,7 +75,7 @@ public:
     // Scaler of COSEM Register object.
     double GetScaler();
 
-    void SetScaler(double value);
+    virtual void SetScaler(double value);
 
     // Unit of COSEM Register object.
     int GetUnit();
@@ -93,12 +93,26 @@ public:
     // Returns amount of methods.
     int GetMethodCount();
 
+    /////////////////////////////////////////////////////////////////////////
+    //Reset the register value.
+    int Reset(
+        CGXDLMSClient* client,
+        std::vector<CGXByteBuffer>& reply);
+
     int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

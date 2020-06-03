@@ -70,7 +70,7 @@ public:
     */
     CGXDLMSActionSchedule(std::string ln, unsigned short sn);
 
-    std::string GetExecutedScriptLogicalName();
+    std::string& GetExecutedScriptLogicalName();
     void SetExecutedScriptLogicalName(std::string value);
 
     int GetExecutedScriptSelector();
@@ -79,8 +79,8 @@ public:
     DLMS_SINGLE_ACTION_SCHEDULE_TYPE GetType();
     void SetType(DLMS_SINGLE_ACTION_SCHEDULE_TYPE value);
 
-    std::vector<CGXDateTime> GetExecutionTime();
-    void SetExecutionTime(std::vector<CGXDateTime> value);
+    std::vector<CGXDateTime>& GetExecutionTime();
+    void SetExecutionTime(std::vector<CGXDateTime>& value);
 
     // Returns amount of attributes.
     int GetAttributeCount();
@@ -91,7 +91,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     int GetDataType(int index, DLMS_DATA_TYPE& type);
 

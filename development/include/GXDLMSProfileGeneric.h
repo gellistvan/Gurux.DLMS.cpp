@@ -100,14 +100,6 @@ private:
         std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns,
         CGXByteBuffer& data);
 
-    /*
-    * Add new capture object (column) to the profile generic.
-    */
-    int AddCaptureObject(
-        CGXDLMSObject* pObj,
-        int attributeIndex,
-        int dataIndex);
-
     int GetProfileGenericData(
         CGXDLMSSettings& settings,
         CGXDLMSValueEventArg& e,
@@ -125,6 +117,13 @@ private:
         std::vector<CGXDLMSVariant>& cols,
         std::vector<std::pair<CGXDLMSObject*, CGXDLMSCaptureObject*> >& columns);
 public:
+    /*
+     * Add new capture object (column) to the profile generic.
+     */
+    int AddCaptureObject(
+        CGXDLMSObject* pObj,
+        int attributeIndex,
+        int dataIndex);
 
     /**
     * Get selected columns from parameters.
@@ -225,7 +224,15 @@ public:
     //Get attribute values of object.
     void GetValues(std::vector<std::string>& values);
 
-    void GetAttributeIndexToRead(std::vector<int>& attributes);
+    /////////////////////////////////////////////////////////////////////////
+    // Returns collection of attributes to read.
+    //
+    // If attribute is static and already read or device is returned
+    // HW error it is not returned.
+    //
+    // all: All items are returned even if they are read already.
+    // attributes: Collection of attributes to read.
+    void GetAttributeIndexToRead(bool all, std::vector<int>& attributes);
 
     //Returns amount of attributes.
     int GetAttributeCount();

@@ -66,11 +66,11 @@ CGXDLMSGSMDiagnostic::~CGXDLMSGSMDiagnostic()
     m_AdjacentCells.clear();
 }
 
-std::string CGXDLMSGSMDiagnostic::GetOperator() {
+std::string& CGXDLMSGSMDiagnostic::GetOperator() {
     return m_Operator;
 }
 
-void CGXDLMSGSMDiagnostic::SetOperator(std::string value) {
+void CGXDLMSGSMDiagnostic::SetOperator(std::string& value) {
     m_Operator = value;
 }
 
@@ -110,7 +110,7 @@ std::vector<GXAdjacentCell*>& CGXDLMSGSMDiagnostic::GetAdjacentCells()
     return m_AdjacentCells;
 }
 
-CGXDateTime CGXDLMSGSMDiagnostic::GetCaptureTime()
+CGXDateTime& CGXDLMSGSMDiagnostic::GetCaptureTime()
 {
     return m_CaptureTime;
 }
@@ -165,45 +165,45 @@ void CGXDLMSGSMDiagnostic::GetValues(std::vector<std::string>& values)
     values.push_back(m_CaptureTime.ToString());
 }
 
-void CGXDLMSGSMDiagnostic::GetAttributeIndexToRead(std::vector<int>& attributes)
+void CGXDLMSGSMDiagnostic::GetAttributeIndexToRead(bool all, std::vector<int>& attributes)
 {
     //LN is static and read only once.
-    if (CGXDLMSObject::IsLogicalNameEmpty(m_LN))
+    if (all || CGXDLMSObject::IsLogicalNameEmpty(m_LN))
     {
         attributes.push_back(1);
     }
     //Operator
-    if (CanRead(2))
+    if (all || CanRead(2))
     {
         attributes.push_back(2);
     }
     // Status
-    if (CanRead(3))
+    if (all || CanRead(3))
     {
         attributes.push_back(3);
     }
     // CircuitSwitchStatus
-    if (CanRead(4))
+    if (all || CanRead(4))
     {
         attributes.push_back(4);
     }
     // PacketSwitchStatus
-    if (CanRead(5))
+    if (all || CanRead(5))
     {
         attributes.push_back(5);
     }
     // CellInfo
-    if (CanRead(6))
+    if (all || CanRead(6))
     {
         attributes.push_back(6);
     }
     // AdjacentCells
-    if (CanRead(7))
+    if (all || CanRead(7))
     {
         attributes.push_back(7);
     }
     // CaptureTime
-    if (CanRead(8))
+    if (all || CanRead(8))
     {
         attributes.push_back(8);
     }
@@ -356,7 +356,7 @@ int CGXDLMSGSMDiagnostic::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
         m_PacketSwitchStatus = (DLMS_GSM_PACKET_SWITCH_STATUS)e.GetValue().ToInteger();
         break;
     case 6:
-        if (e.GetValue().Arr.size() == 4)
+        if (e.GetValue().Arr.size() == 4 || e.GetValue().Arr.size() == 7)
         {
             std::vector<CGXDLMSVariant> tmp = (std::vector<CGXDLMSVariant>) e.GetValue().Arr;
             m_CellInfo.SetCellId(tmp[0].ToInteger());

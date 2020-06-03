@@ -46,7 +46,7 @@ static void ShowHelp()
     printf(" -p \t port number or name (Example: 1000).\r\n");
     printf(" -S [COM1:9600:8None1]\t serial port.");
     printf(" -i IEC is a start protocol.\r\n");
-    printf(" -a \t Authentication (None, Low, High).\r\n");
+    printf(" -a \t Authentication (None, Low, High, HighMd5, HighSha1, HighGmac, HighSha256).\r\n");
     printf(" -P \t Password for authentication.\r\n");
     printf(" -c \t Client address. (Default: 16)\r\n");
     printf(" -s \t Server address. (Default: 1)\r\n");
@@ -55,6 +55,14 @@ static void ShowHelp()
     printf(" -w WRAPPER profile is used. HDLC is default.\r\n");
     printf(" -t Trace messages.\r\n");
     printf(" -g \"0.0.1.0.0.255:1; 0.0.1.0.0.255:2\" Get selected object(s) with given attribute index.\r\n");
+    printf(" -C \t Security Level. (None, Authentication, Encrypted, AuthenticationEncryption)");
+    printf(" -v \t Invocation counter data object Logical Name. Ex. 0.0.43.1.1.255");
+    printf(" -I \t Auto increase invoke ID");
+    printf(" -o \t Cache association view to make reading faster. Ex. -o C:\\device.xml");
+    printf(" -T \t System title that is used with chiphering. Ex -T 4775727578313233");
+    printf(" -A \t Authentication key that is used with chiphering. Ex -A D0D1D2D3D4D5D6D7D8D9DADBDCDDDEDF");
+    printf(" -B \t Block cipher key that is used with chiphering. Ex -B 000102030405060708090A0B0C0D0E0F");
+    printf(" -D \t Dedicated key that is used with chiphering. Ex -D 00112233445566778899AABBCCDDEEFF");
     printf("Example:\r\n");
     printf("Read LG device using TCP/IP connection.\r\n");
     printf("GuruxDlmsSample -r SN -c 16 -s 1 -h [Meter IP Address] -p [Meter Port No]\r\n");
@@ -82,7 +90,6 @@ int main(int argc, char* argv[])
         }
 #endif
         int ret;
-
         //Remove trace file if exists.
         remove("trace.txt");
         remove("LogFile.txt");
@@ -91,15 +98,24 @@ int main(int argc, char* argv[])
         int clientAddress = 16, serverAddress = 1;
         DLMS_AUTHENTICATION authentication = DLMS_AUTHENTICATION_NONE;
         DLMS_INTERFACE_TYPE interfaceType = DLMS_INTERFACE_TYPE_HDLC;
-        char *password = NULL;
-        char *p, *p2, *readObjects = NULL;
+        DLMS_SECURITY security = DLMS_SECURITY_NONE;
+        char* password = NULL;
+        char* p, * p2, * readObjects = NULL;
         int index, a, b, c, d, e, f;
         int opt = 0;
         int port = 0;
         char* address = NULL;
         char* serialPort = NULL;
         bool iec = false;
-        while ((opt = getopt(argc, argv, "h:p:c:s:r:it:a:wP:g:S:")) != -1)
+        bool autoIncreaseInvokeID = false;
+        char* invocationCounter = NULL;
+        char* outputFile = NULL;
+        char* systemTitle = NULL;
+        char* authenticationKey = NULL;
+        char* blockCipherKey = NULL;
+        char* dedicatedKey = NULL;
+
+        while ((opt = getopt(argc, argv, "h:p:c:s:r:iIt:a:wP:g:S:n:C:v:o:T:A:B:D:")) != -1)
         {
             switch (opt)
             {
@@ -153,6 +169,60 @@ int main(int argc, char* argv[])
             case 'i':
                 //IEC.
                 iec = 1;
+                break;
+            case 'I':
+                // AutoIncreaseInvokeID.
+                autoIncreaseInvokeID = true;
+                break;
+            case 'C':
+                if (strcmp("None", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_NONE;
+                }
+                else if (strcmp("Authentication", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_AUTHENTICATION;
+                }
+                else if (strcmp("Encryption", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_ENCRYPTION;
+                }
+                else if (strcmp("AuthenticationEncryption", optarg) == 0)
+                {
+                    security = DLMS_SECURITY_AUTHENTICATION_ENCRYPTION;
+                }
+                else
+                {
+                    printf("Invalid Ciphering option '%s'. (None, Authentication, Encryption, AuthenticationEncryption)", optarg);
+                    return 1;
+                }
+                break;
+            case 'T':
+                systemTitle = optarg;
+                break;
+            case 'A':
+                authenticationKey = optarg;
+                break;
+            case 'B':
+                blockCipherKey = optarg;
+                break;
+            case 'D':
+                dedicatedKey = optarg;
+                break;
+            case 'o':
+                outputFile = optarg;
+                break;
+            case 'v':
+                invocationCounter = optarg;
+#if defined(_WIN32) || defined(_WIN64)//Windows
+                if ((ret = sscanf_s(optarg, "%d.%d.%d.%d.%d.%d", &a, &b, &c, &d, &e, &f)) != 6)
+#else
+                if ((ret = sscanf(optarg, "%d.%d.%d.%d.%d.%d", &a, &b, &c, &d, &e, &f)) != 6)
+#endif
+                {
+                    ShowHelp();
+                    return 1;
+                }
                 break;
             case 'g':
                 //Get (read) selected objects.
@@ -213,13 +283,14 @@ int main(int argc, char* argv[])
                     return 1;
                 }
                 break;
-            case 'o':
-                break;
             case 'c':
                 clientAddress = atoi(optarg);
                 break;
             case 's':
                 serverAddress = atoi(optarg);
+                break;
+            case 'n':
+                serverAddress = CGXDLMSClient::GetServerAddress(atoi(optarg));
                 break;
             case '?':
             {
@@ -247,6 +318,24 @@ int main(int argc, char* argv[])
                 else if (optarg[0] == 'g') {
                     printf("Missing mandatory OBIS code option.\n");
                 }
+                else if (optarg[0] == 'C') {
+                    printf("Missing mandatory Ciphering option.\n");
+                }
+                else if (optarg[0] == 'v') {
+                    printf("Missing mandatory invocation counter logical name option.\n");
+                }
+                else if (optarg[0] == 'T') {
+                    printf("Missing mandatory system title option.");
+                }
+                else if (optarg[0] == 'A') {
+                    printf("Missing mandatory authentication key option.");
+                }
+                else if (optarg[0] == 'B') {
+                    printf("Missing mandatory block cipher key option.");
+                }
+                else if (optarg[0] == 'D') {
+                    printf("Missing mandatory dedicated key option.");
+                }
                 else
                 {
                     ShowHelp();
@@ -260,7 +349,34 @@ int main(int argc, char* argv[])
             }
         }
         CGXDLMSSecureClient cl(useLogicalNameReferencing, clientAddress, serverAddress, authentication, password, interfaceType);
-        CGXCommunication comm(&cl, 5000, trace);
+        cl.GetCiphering()->SetSecurity(security);
+        cl.SetAutoIncreaseInvokeID(autoIncreaseInvokeID);
+        CGXByteBuffer bb;
+        if (systemTitle != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(systemTitle);
+            cl.GetCiphering()->SetSystemTitle(bb);
+        }
+        if (authenticationKey != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(authenticationKey);
+            cl.GetCiphering()->SetAuthenticationKey(bb);
+        }
+        if (blockCipherKey != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(blockCipherKey);
+            cl.GetCiphering()->SetBlockCipherKey(bb);
+        }
+        if (dedicatedKey != NULL)
+        {
+            bb.Clear();
+            bb.SetHexString(dedicatedKey);
+            cl.GetCiphering()->SetDedicatedKey(bb);
+        }
+        CGXCommunication comm(&cl, 5000, trace, invocationCounter);
 
         if (port != 0 || address != NULL)
         {
@@ -284,8 +400,15 @@ int main(int argc, char* argv[])
         {
             if ((ret = comm.Open(serialPort, iec)) != 0)
             {
-                printf("Connect failed %s.\r\n", CGXDLMSConverter::GetErrorMessage(ret));
-                return 1;
+                if (ret == DLMS_ERROR_CODE_RECEIVE_FAILED)
+                {
+                    printf("Failed to receive reply for IEC. Check is DLMS connection already established.\r\n");
+                }
+                else
+                {
+                    printf("Serial port open failed %d.\r\n", ret);
+                    return 1;
+                }
             }
         }
         else
@@ -296,8 +419,21 @@ int main(int argc, char* argv[])
 
         if (readObjects != NULL)
         {
-            if ((ret = comm.InitializeConnection()) == 0 &&
-                (ret = comm.GetAssociationView()) == 0)
+            bool read = false;
+            if (outputFile != NULL)
+            {
+                if ((ret = cl.GetObjects().Load(outputFile)) == 0)
+                {
+                    ret = 0;
+                    read = true;
+                }
+            }
+            ret = comm.InitializeConnection();
+            if (ret == 0 && !read)
+            {
+                ret = comm.GetAssociationView();
+            }
+            if (ret == 0)
             {
                 std::string str;
                 std::string value;
@@ -319,34 +455,52 @@ int main(int argc, char* argv[])
 #endif
                     str.append(p, p2 - p);
                     CGXDLMSObject* obj = cl.GetObjects().FindByLN(DLMS_OBJECT_TYPE_ALL, str);
-                    value.clear();
-                    if ((ret = comm.Read(obj, index, value)) != DLMS_ERROR_CODE_OK)
+                    if (obj != NULL)
                     {
+                        value.clear();
+                        if ((ret = comm.Read(obj, index, value)) != DLMS_ERROR_CODE_OK)
+                        {
 #if _MSC_VER > 1000
-                        sprintf_s(buff, 100, "Error! Index: %d %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+                            sprintf_s(buff, 100, "Error! Index: %d %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #else
-                        sprintf(buff, "Error! Index: %d read failed: %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
+                            sprintf(buff, "Error! Index: %d read failed: %s\r\n", index, CGXDLMSConverter::GetErrorMessage(ret));
 #endif
-                        comm.WriteValue(GX_TRACE_LEVEL_ERROR, buff);
-                        //Continue reading.
+                            comm.WriteValue(GX_TRACE_LEVEL_ERROR, buff);
+                            //Continue reading.
+                        }
+                        else
+                        {
+#if _MSC_VER > 1000
+                            sprintf_s(buff, 100, "Index: %d Value: ", index);
+#else
+                            sprintf(buff, "Index: %d Value: ", index);
+#endif
+                            comm.WriteValue(trace, buff);
+                            comm.WriteValue(trace, value.c_str());
+                            comm.WriteValue(trace, "\r\n");
+                        }
                     }
                     else
                     {
 #if _MSC_VER > 1000
-                        sprintf_s(buff, 100, "Index: %d Value: ", index);
+                        sprintf_s(buff, 100, "Unknown object: %s", str.c_str());
 #else
-                        sprintf(buff, "Index: %d Value: ", index);
+                        sprintf(buff, "Unknown object: %s", str.c_str());
 #endif
-                        comm.WriteValue(trace, buff);
-                        comm.WriteValue(trace, value.c_str());
-                        comm.WriteValue(trace, "\r\n");
+                        str = buff;
+                        comm.WriteValue(GX_TRACE_LEVEL_ERROR, str);
                     }
-
                 } while ((p = strchr(p, ',')) != NULL);
+                //Close connection.
+                comm.Close();
+                if (outputFile != NULL && ret == 0)
+                {
+                    ret = cl.GetObjects().Save(outputFile);
+                }
             }
         }
         else {
-            ret = comm.ReadAll();
+            ret = comm.ReadAll(outputFile);
         }
         //Close connection.
         comm.Close();

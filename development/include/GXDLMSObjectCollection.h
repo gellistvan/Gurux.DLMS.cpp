@@ -37,6 +37,7 @@
 
 #include <vector>
 #include "GXDLMSObject.h"
+#include "GXXmlWriterSettings.h"
 
 class CGXDLMSObjectCollection : public std::vector<CGXDLMSObject*>
 {
@@ -57,6 +58,32 @@ public:
     void Free();
 
     std::string ToString();
+
+    /**
+    * Save COSEM objects to the file.
+    *
+    * fileName: File name.
+    */
+    int Save(
+        const char* fileName);
+
+    /**
+    * Save COSEM objects to the file.
+    *
+    * fileName: File name.
+    * settings: XML write settings.
+    */
+    int Save(
+        const char* fileName,
+        CGXXmlWriterSettings& settings);
+
+    /**
+    * Load COSEM objects from the file.
+    *
+    * fileName XML file name.
+    */
+    int Load(
+        const char* fileName);
 };
 
 #endif //GXDLMSOBJECTCOLLECTION_H

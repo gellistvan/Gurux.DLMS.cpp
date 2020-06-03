@@ -81,6 +81,10 @@ int CGXDLMSObject::GetLogicalName(CGXDLMSObject* target, CGXDLMSVariant& value)
 
 int CGXDLMSObject::SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
 {
+    if (value.vt == DLMS_DATA_TYPE_STRING)
+    {
+        return GXHelpers::SetLogicalName(value.strVal.c_str(), target->m_LN);
+    }
     if (value.vt != DLMS_DATA_TYPE_OCTET_STRING || value.GetSize() != 6)
     {
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
@@ -89,10 +93,13 @@ int CGXDLMSObject::SetLogicalName(CGXDLMSObject * target, CGXDLMSVariant& value)
     return DLMS_ERROR_CODE_OK;
 }
 
+int CGXDLMSObject::SetLogicalName(CGXDLMSObject* target, std::string& value)
+{
+    return GXHelpers::SetLogicalName(value.c_str(), target->m_LN);
+}
+
 void CGXDLMSObject::Initialize(short sn, unsigned short class_id, unsigned char version, CGXByteBuffer* ln)
 {
-    m_AttributeIndex = 0;
-    m_DataIndex = 0;
     m_SN = sn;
     m_ObjectType = (DLMS_OBJECT_TYPE)class_id;
     m_Version = version;
@@ -310,40 +317,15 @@ CGXAttributeCollection& CGXDLMSObject::GetMethodAttributes()
 {
     return m_MethodAttributes;
 }
-/*TODO:
-//Get Object's attribute index.
-char CGXDLMSObject::GetAttributeIndex()
-{
-    return m_AttributeIndex;
-}
-
-//Set Object's attribute index.
-void CGXDLMSObject::SetAttributeIndex(char value)
-{
-    m_AttributeIndex = value;
-}
-
-//Get Object's data index.
-unsigned short CGXDLMSObject::GetDataIndex()
-{
-    return m_DataIndex;
-}
-
-//Set Object's data index.
-void CGXDLMSObject::SetDataIndex(unsigned short value)
-{
-    m_DataIndex = value;
-}
-*/
 
 //Get Object's Logical Name.
-std::string CGXDLMSObject::GetDescription()
+std::string& CGXDLMSObject::GetDescription()
 {
     return m_Description;
 }
 
 //Set Object's Logical Name.
-void CGXDLMSObject::SetDescription(std::string value)
+void CGXDLMSObject::SetDescription(std::string& value)
 {
     m_Description = value;
 }
