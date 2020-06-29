@@ -1140,7 +1140,7 @@ int CGXDLMSClient::DisconnectRequest(std::vector<CGXByteBuffer>& packets)
     int ret;
     CGXByteBuffer reply;
     packets.clear();
-    m_Settings.SetMaxReceivePDUSize(0xFFFF);
+//    m_Settings.SetMaxReceivePDUSize(0xFFFF);
     if (GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC && (m_Settings.GetConnected() & DLMS_CONNECTION_STATE_HDLC) != 0)
     {
         ret = CGXDLMS::GetHdlcFrame(m_Settings, DLMS_COMMAND_DISCONNECT_REQUEST, NULL, reply);
