@@ -1286,6 +1286,193 @@ int handleResultComponent(DLMS_SOURCE_DIAGNOSTIC value)
     return ret;
 }
 
+int handleUserInformationResultComponent(int source, int type, DLMS_SOURCE_DIAGNOSTIC value)
+{
+  int ret;
+  DLMS_SERVICE_ERROR_SOURCE src = (DLMS_SERVICE_ERROR_SOURCE) source;
+
+  switch (src)
+  {
+    case DLMS_SERVICE_ERROR_SOURCE_HARDWARE_RESOURCE:
+    {
+      DLMS_SERIVCE_ERROR_HARDWARE_RESOURCE_TYPE error_type = (DLMS_SERIVCE_ERROR_HARDWARE_RESOURCE_TYPE) type;
+      switch(error_type)
+      {
+        case MEMORY_UNAVAILABLE:
+          ret = DLMS_ERROR_CODE_MEMORY_UNAVAILABLE;
+          break;
+        case MASS_STORAGE_UNAVAILABLE:
+          ret = DLMS_ERROR_CODE_MASS_STORAGE_UNAVAILABLE;
+          break;
+        case OTHER_RESOURCE_UNAVAILABLE:
+          ret = DLMS_ERROR_CODE_OTHER_RESOURCE_UNAVAILABLE;
+          break;
+
+        case HARDWARE_RESOURCE_OTHER:
+        default:
+          return handleResultComponent(value);
+
+      }
+    }
+    case DLMS_SERVICE_ERROR_SOURCE_VDE_STATE_ERROR:
+    {
+      DLMS_SERIVCE_ERROR_VDE_STATE_ERROR_TYPE error_type = (DLMS_SERIVCE_ERROR_VDE_STATE_ERROR_TYPE) type;
+      switch(error_type)
+      {
+        case NO_DLMS_CONTEXT:
+          ret = DLMS_ERROR_CODE_NO_DLMS_CONTEXT;
+          break;
+        case LOADING_DATA_SET:
+          ret = DLMS_ERROR_CODE_LOADING_DATA_SET;
+          break;
+        case STATUS_NOCHANGE:
+          ret = DLMS_ERROR_CODE_STATUS_NOCHANGE;
+          break;
+        case STATUS_INOPERABLE:
+          ret = DLMS_ERROR_CODE_STATUS_INOPERABLE;
+          break;
+        case VDE_STATE_ERROR_OTHER:
+        default:
+          return handleResultComponent(value);
+      }
+    }
+    case DLMS_SERVICE_ERROR_SOURCE_SERVICE:
+    {
+      DLMS_SERIVCE_ERROR_SERVICE_TYPE error_type = (DLMS_SERIVCE_ERROR_SERVICE_TYPE) type;
+      switch(error_type)
+      {
+        case PDU_SIZE:
+          ret = DLMS_ERROR_CODE_PDU_SIZE;
+          break;
+        case SERVICE_UNSUPPORTED:
+          ret = DLMS_ERROR_CODE_SERVICE_UNSUPPORTED;
+          break;
+        case SERVICE_OTHER:
+        default:
+          return handleResultComponent(value);
+      }
+    }
+    case DLMS_SERVICE_ERROR_SOURCE_DEFINITION:
+    {
+      DLMS_SERIVCE_ERROR_DEFINITION_TYPE error_type = (DLMS_SERIVCE_ERROR_DEFINITION_TYPE) type;
+      switch(error_type)
+      {
+        case OBJECT_UNDEFINED:
+          ret = DLMS_ERROR_CODE_OBJECT_UNDEFINED;
+          break;
+        case OBJECT_CLASS_INCONSISTENT:
+          ret = DLMS_ERROR_CODE_OBJECT_CLASS_INCONSISTENT;
+          break;
+        case OBJECT_ATTRIBUTE_INCONSISTENT:
+          ret = DLMS_ERROR_CODE_OBJECT_ATTRIBUTE_INCONSISTENT;
+          break;
+        case DEFINITION_OTHER:
+        default:
+          return handleResultComponent(value);
+      }
+    }
+    case DLMS_SERVICE_ERROR_SOURCE_ACCESS:
+    {
+      DLMS_SERIVCE_ERROR_ACCESS_TYPE error_type = (DLMS_SERIVCE_ERROR_ACCESS_TYPE) type;
+      switch(error_type)
+      {
+        case SCOPE_OF_ACCESS_VIOLATED:
+          ret = DLMS_ERROR_CODE_SCOPE_OF_ACCESS_VIOLATED;
+          break;
+        case OBJECT_ACCESS_INVALID:
+          ret = DLMS_ERROR_CODE_OBJECT_ACCESS_INVALID;
+          break;
+        case HARDWARE_FAULT:
+          ret = DLMS_ERROR_CODE_HARDWARE_FAULT;
+          break;
+        case OBJECT_UNAVAILABLE:
+          ret = DLMS_ERROR_CODE_OBJECT_UNAVAILABLE;
+          break;
+        case ACCESS_OTHER:
+        default:
+          return handleResultComponent(value);
+      }
+    }
+    case DLMS_SERVICE_ERROR_SOURCE_INITIATE:
+    {
+      DLMS_SERIVCE_ERROR_INITIATE_TYPE error_type = (DLMS_SERIVCE_ERROR_INITIATE_TYPE) type;
+      switch(error_type)
+      {
+        case DLMS_VERSION_TOO_LOW:
+          ret = DLMS_ERROR_CODE_DLMS_VERSION_TOO_LOW;
+          break;
+        case INCOMPATIBLE_CONFORMANCE:
+          ret = DLMS_ERROR_CODE_INCOMPATIBLE_CONFORMANCE;
+          break;
+        case PDU_SIZE_TOO_SHORT:
+          ret = DLMS_ERROR_CODE_PDU_SIZE_TOO_SHORT;
+          break;
+        case REFUSED_BY_THE_VDEHANDLER:
+          ret = DLMS_ERROR_CODE_REFUSED_BY_THE_VDEHANDLER;
+          break;
+        case INITIATE_OTHER:
+        default:
+          return handleResultComponent(value);
+      }
+    }
+    case DLMS_SERVICE_ERROR_SOURCE_LOAD_DATASET:
+    {
+      DLMS_SERIVCE_ERROR_LOAD_DATA_SET_TYPE error_type = (DLMS_SERIVCE_ERROR_LOAD_DATA_SET_TYPE) type;
+      switch(error_type)
+      {
+        case PRIMITIVE_OUT_OF_SEQUENCE:
+          ret = DLMS_ERROR_CODE_PRIMITIVE_OUT_OF_SEQUENCE;
+          break;
+        case NOT_LOADABLE:
+          ret = DLMS_ERROR_CODE_NOT_LOADABLE;
+          break;
+        case DATASET_SIZE_TOO_LARGE:
+          ret = DLMS_ERROR_CODE_DATASET_SIZE_TOO_LARGE;
+          break;
+        case NOT_AWAITED_SEGMENT:
+          ret = DLMS_ERROR_CODE_NOT_AWAITED_SEGMENT;
+          break;
+        case INTERPRETATION_FAILURE:
+          ret = DLMS_ERROR_CODE_INTERPRETATION_FAILURE;
+          break;
+        case STORAGE_FAILURE:
+          ret = DLMS_ERROR_CODE_STORAGE_FAILURE;
+          break;
+        case DATA_SET_NOT_READY:
+          ret = DLMS_ERROR_CODE_DATA_SET_NOT_READY;
+          break;
+        case LOAD_DATA_SET_OTHER:
+        default:
+          return handleResultComponent(value);
+      }
+    }
+    case DLMS_SERVICE_ERROR_SOURCE_TASK:
+    {
+      DLMS_SERIVCE_ERROR_TASK_TYPE error_type = (DLMS_SERIVCE_ERROR_TASK_TYPE) type;
+      switch(error_type)
+      {
+        case NO_REMOTE_CONTROL:
+          ret = DLMS_ERROR_CODE_NO_REMOTE_CONTROL;
+          break;
+        case TI_STOPPED:
+          ret = DLMS_ERROR_CODE_TI_STOPPED;
+          break;
+        case TI_RUNNING:
+          ret = DLMS_ERROR_CODE_TI_RUNNING;
+          break;
+        case TI_UNUSABLE:
+          ret = DLMS_ERROR_CODE_TI_UNUSABLE;
+          break;
+        case TASK_OTHER:
+        default:
+          return handleResultComponent(value);
+      }
+    }
+  }
+
+  return ret;
+}
+
 int ParseProtocolVersion(CGXDLMSSettings& settings,
     CGXByteBuffer& buff)
 {
@@ -1847,10 +2034,65 @@ int CGXAPDU::ParsePDU2(
             // 0xBE
         case BER_TYPE_CONTEXT | BER_TYPE_CONSTRUCTED | PDU_TYPE_USER_INFORMATION:
             //Check result component. Some meters are returning invalid user-information if connection failed.
+
+            //06 04 04 0E 01 06 04
             if (xml == NULL && result != DLMS_ASSOCIATION_RESULT_ACCEPTED
                 && diagnostic != DLMS_SOURCE_DIAGNOSTIC_NONE)
             {
-                return handleResultComponent(diagnostic);
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                    return ret;
+                }
+                if (len != 6)
+                {
+                    return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                  return ret;
+                }
+                if (tag != 0x04)
+                {
+                    return DLMS_ERROR_CODE_INVALID_PARAMETER;
+                }
+
+                if ((ret = buff.GetUInt8(&len)) != 0)
+                {
+                   return ret;
+                }
+                if (len != 4)
+                {
+                  return DLMS_ERROR_CODE_INVALID_TAG;
+                }
+
+                 // todo this shall be 0x0E ?
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                   return ret;
+                }
+
+                // todo this shall be the servce value
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                   return ret;
+                }
+
+                int service_error_source, service_error_type;
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+
+                service_error_source = tag;
+                if ((ret = buff.GetUInt8(&tag)) != 0)
+                {
+                    return ret;
+                }
+
+                service_error_type = tag;
+
+                return handleUserInformationResultComponent(service_error_source, service_error_type, diagnostic);
             }
             if ((ret = ParseUserInformation(settings, cipher, buff, xml)) != 0)
             {

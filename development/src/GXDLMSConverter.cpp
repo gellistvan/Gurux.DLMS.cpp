@@ -175,6 +175,98 @@ const char* CGXDLMSConverter::GetErrorMessage(int error)
     case DLMS_ERROR_CODE_INVALID_INVOKE_ID:
         str = "Invalid Invoke ID.";
         break;
+
+    case DLMS_ERROR_CODE_MEMORY_UNAVAILABLE:
+        str = "Memory unavailable.";
+        break;
+    case DLMS_ERROR_CODE_MASS_STORAGE_UNAVAILABLE:
+        str = "Mass storage unavailable.";
+        break;
+    case DLMS_ERROR_CODE_OTHER_RESOURCE_UNAVAILABLE:
+        str = "Other resource unavailable.";
+        break;
+    case DLMS_ERROR_CODE_NO_DLMS_CONTEXT:
+        str = "No DLMS context.";
+        break;
+    case DLMS_ERROR_CODE_LOADING_DATA_SET:
+        str = "Loading data set.";
+        break;
+    case DLMS_ERROR_CODE_STATUS_NOCHANGE:
+        str = "Status no change.";
+        break;
+    case DLMS_ERROR_CODE_STATUS_INOPERABLE:
+        str = "Status inoperable.";
+        break;
+    case DLMS_ERROR_CODE_PDU_SIZE:
+        str = "PDU size.";
+        break;
+    case DLMS_ERROR_CODE_SERVICE_UNSUPPORTED:
+        str = "Service unsupported.";
+        break;
+    case DLMS_ERROR_CODE_OBJECT_UNDEFINED:
+        str = "Object undefined.";
+        break;
+    case DLMS_ERROR_CODE_OBJECT_CLASS_INCONSISTENT:
+        str = "Object class inconsistent.";
+        break;
+    case DLMS_ERROR_CODE_OBJECT_ATTRIBUTE_INCONSISTENT:
+        str = "Object attribute inconsistent.";
+        break;
+    case DLMS_ERROR_CODE_SCOPE_OF_ACCESS_VIOLATED:
+        str = "Scope of access violated.";
+        break;
+    case DLMS_ERROR_CODE_OBJECT_ACCESS_INVALID:
+        str = "Object access invalid.";
+        break;
+    case DLMS_ERROR_CODE_OBJECT_UNAVAILABLE:
+        str = "Object unavailable.";
+        break;
+    case DLMS_ERROR_CODE_DLMS_VERSION_TOO_LOW:
+        str = "DLMS version too low.";
+        break;
+    case DLMS_ERROR_CODE_INCOMPATIBLE_CONFORMANCE:
+        str = "Incompatible conformance.";
+        break;
+    case DLMS_ERROR_CODE_PDU_SIZE_TOO_SHORT:
+        str = "Pdu size too short.";
+        break;
+    case DLMS_ERROR_CODE_REFUSED_BY_THE_VDEHANDLER:
+        str = "Refused by the VDE handler.";
+        break;
+    case DLMS_ERROR_CODE_PRIMITIVE_OUT_OF_SEQUENCE:
+        str = "Primitive out of sequence.";
+        break;
+    case DLMS_ERROR_CODE_NOT_LOADABLE:
+        str = "Not loadable.";
+        break;
+    case DLMS_ERROR_CODE_DATASET_SIZE_TOO_LARGE:
+        str = "Dataset size too large.";
+        break;
+    case DLMS_ERROR_CODE_NOT_AWAITED_SEGMENT:
+        str = "Not awaited segment.";
+        break;
+    case DLMS_ERROR_CODE_INTERPRETATION_FAILURE:
+        str = "Interpretation failure.";
+        break;
+    case DLMS_ERROR_CODE_STORAGE_FAILURE:
+        str = "Storage failure.";
+        break;
+    case DLMS_ERROR_CODE_DATA_SET_NOT_READY:
+        str = "Data set not ready.";
+        break;
+    case DLMS_ERROR_CODE_NO_REMOTE_CONTROL:
+        str = "No remote c.ontrol";
+        break;
+    case DLMS_ERROR_CODE_TI_STOPPED:
+        str = "ti stopped.";
+        break;
+    case DLMS_ERROR_CODE_TI_RUNNING:
+        str = "ti running.";
+        break;
+    case DLMS_ERROR_CODE_TI_UNUSABLE:
+        str = "ti unusable.";
+        break;
+
     default:
         str = "Unknown error.";
         break;
