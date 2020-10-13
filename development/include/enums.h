@@ -882,6 +882,11 @@ typedef enum
     * A necessary parameters to set up and manage the G3 PLC MAC layer.
     */
     DLMS_OBJECT_TYPE_G3_PLC_MAC_SETUP = 91,
+
+    /*
+    * A necessary parameters to set up and manage the G3 PLC adaptation layer.
+    */
+    DLMS_OBJECT_TYPE_G3_PLC_ADAPTATION_LAYER_6_LOW_PAN_SETUP = 92,
     /*
     * Configure a ZigBee PRO device with information necessary to create or
     * join the network.

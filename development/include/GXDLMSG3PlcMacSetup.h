@@ -147,6 +147,7 @@ public:
     //LN Constructor.
     CGXDLMSG3PlcMacSetup(std::string ln);
 
+    virtual ~CGXDLMSG3PlcMacSetup();
 
     // Returns amount of attributes.
     int GetAttributeCount();

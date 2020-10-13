@@ -56,6 +56,15 @@ CGXDLMSG3PlcMacSetup::CGXDLMSG3PlcMacSetup(std::string ln) :
 
 }
 
+CGXDLMSG3PlcMacSetup::~CGXDLMSG3PlcMacSetup()
+{
+    for (std::vector<CGXDLMSNeighbourTableElement*>::iterator it = m_NeighbourTable.begin(); it != m_NeighbourTable.end(); ++it)
+    {
+      delete *it;
+    }
+    m_NeighbourTable.clear();
+}
+
 // Returns amount of attributes.
 int CGXDLMSG3PlcMacSetup::GetAttributeCount()
 {
@@ -440,7 +449,60 @@ int CGXDLMSG3PlcMacSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     else if (e.GetIndex() == 11)
     {
-      //TODO
+      e.GetValue().vt = DLMS_DATA_TYPE_ARRAY;
+
+      for (std::vector<CGXDLMSNeighbourTableElement*>::iterator it = m_NeighbourTable.begin(); it != m_NeighbourTable.end(); ++it)
+      {
+          CGXDLMSVariant element;
+          element.vt = DLMS_DATA_TYPE_STRUCTURE;
+
+          CGXDLMSVariant short_address;
+          short_address.uiVal = it->GetShortAddress();
+
+          CGXDLMSVariant l_PayloadModulationScheme;
+          l_PayloadModulationScheme.boolVal = it->GetPayloadModulationScheme();
+
+          CGXDLMSVariant l_ToneMap;
+          l_ToneMap.strVal = it->GetToneMap();
+
+          CGXDLMSVariant l_Modulation;
+          l_Modulation.uiVal = it->GetModulation();
+
+          CGXDLMSVariant l_TxGain;
+          l_TxGain.cVal = it->GetTxGain();
+
+          CGXDLMSVariant l_TxRes;
+          l_TxRes.bVal = it->GetTxRes();
+
+          CGXDLMSVariant l_TxCoeff;
+          l_TxCoeff.strVal = it->GetTxCoeff();
+
+          CGXDLMSVariant l_Lqi;
+          l_Lqi.bVal = it->GetLqi();
+
+          CGXDLMSVariant l_PhaseDifferencial;
+          l_PhaseDifferencial.cVal = it->GetPhaseDifferencial();
+
+          CGXDLMSVariant l_TmrValidTime;
+          l_TmrValidTime.bVal = it->GetTmrValidTime();
+
+          CGXDLMSVariant l_NeighbourValidTime;
+          l_NeighbourValidTime.bVal = it->GetNeighbourValidTime();
+
+          element.Arr.push_back(l_ShortAddress);
+          element.Arr.push_back(l_PayloadModulationScheme);
+          element.Arr.push_back(l_ToneMap);
+          element.Arr.push_back(l_Modulation);
+          element.Arr.push_back(l_TxGain);
+          element.Arr.push_back(l_TxRes);
+          element.Arr.push_back(l_TxCoeff);
+          element.Arr.push_back(l_Lqi);
+          element.Arr.push_back(l_PhaseDifferencial);
+          element.Arr.push_back(l_TmrValidTime);
+          element.Arr.push_back(l_NeighbourValidTime);
+
+          e.GetValue().Arr.push_back(element);
+      }
     }
     else if (e.GetIndex() == 12)
     {
@@ -527,8 +589,30 @@ int CGXDLMSG3PlcMacSetup::SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
     }
     else if (e.GetIndex() == 11)
     {
-//      NeighbourTableEntryTtl = e.GetValue().bVal;
-//TODO
+        for (std::vector<CGXDLMSNeighbourTableElement*>::iterator it = m_NeighbourTable.begin(); it != m_NeighbourTable.end(); ++it)
+        {
+            delete *it;
+        }
+        m_NeighbourTable.clear();
+
+        for (std::vector<CGXDLMSVariant>::iterator it = e.GetValue().Arr.begin(); it != e.GetValue().Arr.end(); ++it)
+        {
+            CGXDLMSNeighbourTableElement *element = new CGXDLMSNeighbourTableElement;
+
+            element->SetShortAddress(it->Arr[0].uiVal);
+            element->SetPayloadModulationScheme(it->Arr[1].boolVal);
+            element->SetToneMap(it->Arr[2].strVal);
+            element->SetModulation(it->Arr[3].uiVal);
+            element->SetTxGain(it->Arr[4].bVal);
+            element->SetTxRes(it->Arr[5].bVal);
+            element->SetTxCoeff(it->Arr[6].strVal);
+            element->SetLqi(it->Arr[7].bVal);
+            element->SetPhaseDifferencial(it->Arr[8].cVal);
+            element->SetTmrValidTime(it->Arr[9].bVal);
+            element->SetNeighbourValidTime(it->Arr[10].bVal);
+
+            m_NeighbourTable.push_back(element);
+        }
     }
     else if (e.GetIndex() == 12)
     {
