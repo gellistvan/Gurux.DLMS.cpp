@@ -156,7 +156,7 @@ enum DLMS_BAUD_RATE
 enum DLMS_OPTICAL_PROTOCOL_MODE
 {
     /*
-     Protocol according to IEC 62056-21 (modes A…E),
+     Protocol according to IEC 62056-21 (modes Aï¿½E),
     */
     DLMS_OPTICAL_PROTOCOL_MODE_DEFAULT = 0,
     /*
@@ -872,6 +872,16 @@ typedef enum
     */
     DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION = 86,
 
+    /*
+     * Statistical information on the operation of the MAC layer for management
+     * purposes.
+     */
+    DLMS_OBJECT_TYPE_G3_PLC_MAC_COUNTERS = 90,
+
+    /*
+    * A necessary parameters to set up and manage the G3 PLC MAC layer.
+    */
+    DLMS_OBJECT_TYPE_G3_PLC_MAC_SETUP = 91,
     /*
     * Configure a ZigBee PRO device with information necessary to create or
     * join the network.
