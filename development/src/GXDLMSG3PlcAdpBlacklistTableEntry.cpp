@@ -56,7 +56,7 @@ void CGXDLMSG3PlcAdpBlacklistTableEntry::SetValidTime(unsigned short value)
   m_ValidTime = value;
 }
 
-std::string ToString()
+std::string CGXDLMSG3PlcAdpBlacklistTableEntry::ToString()
 {
   std::stringstream sb;
   sb << m_BlacklistedNeighbourAddress << " " << m_ValidTime;

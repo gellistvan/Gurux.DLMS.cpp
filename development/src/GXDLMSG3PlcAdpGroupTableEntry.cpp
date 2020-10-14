@@ -50,4 +50,4 @@ std::string CGXDLMSG3PlcAdpGroupTableEntry::ToString()
   std::stringstream sb;
   sb << m_GroupAddress;
   return sb.str();
-)
+}

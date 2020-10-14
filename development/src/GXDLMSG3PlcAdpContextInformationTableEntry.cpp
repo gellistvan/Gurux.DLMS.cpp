@@ -79,23 +79,23 @@ void CGXDLMSG3PlcAdpContextInformationTableEntry::SetC(bool value)
 
 unsigned short CGXDLMSG3PlcAdpContextInformationTableEntry::GetValidLifetime()
 {
-    return m_ValidLifetimeGet;
+    return m_ValidLifetime;
 }
 
 void CGXDLMSG3PlcAdpContextInformationTableEntry::SetValidLifetime(unsigned short value)
 {
-  m_ValidLifetimeGet = value;
+  m_ValidLifetime = value;
 }
 
-std::string ToString()
+std::string CGXDLMSG3PlcAdpContextInformationTableEntry::ToString()
 {
   std::stringstream sb;
 
-  sb << m_Cid << sb " ";
-  sb << m_ContextLength << sb " ";
-  sb << m_Context << sb " ";
-  sb << m_C << sb " ";
-  sb << m_ValidLifetimeGet;
+  sb << m_Cid << " ";
+  sb << m_ContextLength << " ";
+  sb << m_Context << " ";
+  sb << m_C << " ";
+  sb << m_ValidLifetime;
 
   return sb.str();
 }

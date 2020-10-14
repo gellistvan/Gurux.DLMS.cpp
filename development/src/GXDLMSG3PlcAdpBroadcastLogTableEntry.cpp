@@ -58,7 +58,7 @@ void CGXDLMSG3PlcAdpBroadcastLogTableEntry::SetSequenceNumber(unsigned char valu
 
 unsigned short CGXDLMSG3PlcAdpBroadcastLogTableEntry::GetTimeToLive()
 {
-  return m_TimeToLiveGet;
+  return m_TimeToLive;
 }
 
 void CGXDLMSG3PlcAdpBroadcastLogTableEntry::SetTimeToLive(unsigned short value)
