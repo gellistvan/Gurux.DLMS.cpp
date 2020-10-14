@@ -38,6 +38,11 @@
 #include "GXDLMSObject.h"
 
 #include "GXDLMSG3PlcAdpRoutingTableEntry.h"
+#include "GXDLMSG3PlcAdpContextInformationTableEntry.h"
+#include "GXDLMSG3PlcAdpBlacklistTableEntry.h"
+#include "GXDLMSG3PlcAdpBroadcastLogTableEntry.h"
+#include "GXDLMSG3PlcAdpGroupTableEntry.h"
+#include "GXDLMSG3PlcAdpRoutingConfigurationEntry.h"
 
 
 #include <vector>
@@ -55,14 +60,14 @@ class CGXDLMSG3PlcAdaptationLayer6LoWpanSetup : public CGXDLMSObject
   unsigned char m_MaxHops;
   unsigned char m_WeakLqiValue;
   unsigned char m_SecurityLevel;
-  //std::vector
-  //std::vector
+  std::vector<std::string> m_PrefixTable;
+  std::vector<CGXDLMSG3PlcAdpRoutingConfigurationEntry*> m_RoutingConfiguration;
   unsigned short m_BrdcastLogTableEntryTtl;
-  std::vector<CGXDLMSG3PlcAdpRoutingTableEntry*> m_RoutingTable
-  //std::vector
-  //std::vector
-  //std::vector
-  //std::vector
+  std::vector<CGXDLMSG3PlcAdpRoutingTableEntry*> m_RoutingTable;
+  std::vector<CGXDLMSG3PlcAdpContextInformationTableEntry*> m_ContextInformationTable;
+  std::vector<CGXDLMSG3PlcAdpBlacklistTableEntry*> m_BlacklistTable;
+  std::vector<CGXDLMSG3PlcAdpBroadcastLogTableEntry*> m_BroadcastLogTable;
+  std::vector<CGXDLMSG3PlcAdpGroupTableEntry*> m_GroupTable;
   unsigned short m_MaxJoinWaitTime;
   unsigned char m_PathDiscoveryTime;
   unsigned char m_ActiveKeyIndex;
@@ -82,7 +87,11 @@ public:
   unsigned char GetSecurityLevel();
   void SetSecurityLevel(unsigned char value);
 
+  std::vector<std::string> GetPrefixTable();
+  void SetPrefixTable(const std::vector<std::string>& value);
 
+  std::vector<CGXDLMSG3PlcAdpRoutingConfigurationEntry*> GetRoutingConfiguration();
+  void SetRoutingConfiguration(std::vector<CGXDLMSG3PlcAdpRoutingConfigurationEntry*> value);
 
   unsigned short GetBrdcastLogTableEntryTtl();
   void SetBrdcastLogTableEntryTtl(unsigned short value);
@@ -90,6 +99,17 @@ public:
   std::vector<CGXDLMSG3PlcAdpRoutingTableEntry*> GetRoutingTable();
   void SetRoutingTable(std::vector<CGXDLMSG3PlcAdpRoutingTableEntry*> value);
 
+  std::vector<CGXDLMSG3PlcAdpContextInformationTableEntry*> GetContextInformationTable();
+  void SetContextInformationTable(std::vector<CGXDLMSG3PlcAdpContextInformationTableEntry*> value);
+
+  std::vector<CGXDLMSG3PlcAdpBlacklistTableEntry*> GetBlacklistTable();
+  void SetBlacklistTable(std::vector<CGXDLMSG3PlcAdpBlacklistTableEntry*> value);
+
+  std::vector<CGXDLMSG3PlcAdpBroadcastLogTableEntry*> GetBroadcastLogTable();
+  void SetBroadcastLogTable(std::vector<CGXDLMSG3PlcAdpBroadcastLogTableEntry*> value);
+
+  std::vector<CGXDLMSG3PlcAdpGroupTableEntry*> GetGroupTable();
+  void SetGroupTable(std::vector<CGXDLMSG3PlcAdpGroupTableEntry*> value);
 
   unsigned short GetMaxJoinWaitTime();
   void SetMaxJoinWaitTime(unsigned short value);
@@ -153,9 +173,9 @@ public:
 
 private:
   template <typename ObjectType>
-  void ClearVector(std::vector<ObjectType*>& p_vector))
+  void ClearVector(std::vector<ObjectType*>& p_vector)
   {
-    for(std::vector<ObjectType*>::iterator it = p_vector.begin(); it != p_vector.end(); ++it)
+    for(typename std::vector<ObjectType*>::iterator it = p_vector.begin(); it != p_vector.end(); ++it)
     {
       delete (*it);
     }
@@ -163,13 +183,13 @@ private:
     p_vector.clear();
   }
 
-  template <typenameObjectType>
+  template <typename ObjectType>
   std::string PrintVector(std::vector<ObjectType*> p_vector)
   {
     std::stringstream sb;
     sb << '[';
     bool empty = true;
-    for (std::vector<ObjectType*>::iterator it = p_vector.begin(); it != p_vector.end(); ++it)
+    for (typename std::vector<ObjectType*>::iterator it = p_vector.begin(); it != p_vector.end(); ++it)
     {
       if (!empty)
       {
@@ -178,6 +198,25 @@ private:
       empty = false;
       std::string str = (*it)->ToString();
       sb.write(str.c_str(), str.size());
+    }
+    sb << ']';
+
+    return sb.str();
+  }
+
+  std::string PrintVector(const std::vector<std::string>& p_vector)
+  {
+    std::stringstream sb;
+    sb << '[';
+    bool empty = true;
+    for (std::vector<std::string>::const_iterator it = p_vector.cbegin(); it != p_vector.cend(); ++it)
+    {
+      if (!empty)
+      {
+        sb << ", ";
+      }
+      empty = false;
+      sb << (*it);
     }
     sb << ']';
 

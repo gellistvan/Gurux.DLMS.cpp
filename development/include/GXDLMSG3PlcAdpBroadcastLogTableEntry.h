@@ -32,39 +32,27 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSG3PLCADPROUTINGTABLEENTRY_H
-#define GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#ifndef GXDLMSG3PLCADPBROADCASTLOGTABLEENTRY_H
+#define GXDLMSG3PLCADPBROADCASTLOGTABLEENTRY_H
 
 #include <string>
 
-class CGXDLMSG3PlcAdpRoutingTableEntry
+class CGXDLMSG3PlcAdpBroadcastLogTableEntry
 {
-  unsigned short m_DestinationAddress;
-  unsigned short m_NextHopAddress;
-  unsigned short m_RouteCost;
-  unsigned char m_HopCount;
-  unsigned char m_WeakLinkCount;
-  unsigned short m_ValidTime;
+  unsigned short m_SourceAddress;
+  unsigned char m_SequenceNumber;
+  unsigned short m_TimeToLive;
 
 public:
-  unsigned short GetDestinationAddress();
-  void SetDestinationAddress(unsigned short value);
+  unsigned short GetSourceAddress();
+  void SetSourceAddress(unsigned short value);
 
-  unsigned short GetNextHopAddress();
-  void SetNextHopAddress(unsigned short value);
+  unsigned char GetSequenceNumber();
+  void SetSequenceNumber(unsigned char value);
 
-  unsigned short GetRouteCost();
-  void SetRouteCost(unsigned short value);
-
-  unsigned char GetHopCount();
-  void SetHopCount(unsigned char value);
-
-  unsigned char GetWeakLinkCount();
-  void SetWeakLinkCount(unsigned char value);
-
-  unsigned short GetValidTime();
-  void SetValidTime(unsigned short value);
+  unsigned short GetTimeToLive();
+  void SetTimeToLive(unsigned short value);
 
   std::string ToString();
 };
-#endif //GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#endif //GXDLMSG3PLCADPBROADCASTLOGTABLEENTRY_H

@@ -33,12 +33,13 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSG3PlcAdpRoutingTableEntry.h"
+
 #include <sstream>
 
 
 unsigned short CGXDLMSG3PlcAdpRoutingTableEntry::GetDestinationAddress()
 {
-  return m_DestinationAddress
+  return m_DestinationAddress;
 }
 
 void CGXDLMSG3PlcAdpRoutingTableEntry::SetDestinationAddress(unsigned short value)
@@ -48,7 +49,7 @@ void CGXDLMSG3PlcAdpRoutingTableEntry::SetDestinationAddress(unsigned short valu
 
 unsigned short CGXDLMSG3PlcAdpRoutingTableEntry::GetNextHopAddress()
 {
-  return m_NextHopAddress
+  return m_NextHopAddress;
 }
 
 void CGXDLMSG3PlcAdpRoutingTableEntry::SetNextHopAddress(unsigned short value)
@@ -58,7 +59,7 @@ void CGXDLMSG3PlcAdpRoutingTableEntry::SetNextHopAddress(unsigned short value)
 
 unsigned short CGXDLMSG3PlcAdpRoutingTableEntry::GetRouteCost()
 {
-  return m_RouteCost
+  return m_RouteCost;
 }
 
 void CGXDLMSG3PlcAdpRoutingTableEntry::SetRouteCost(unsigned short value)
@@ -68,7 +69,7 @@ void CGXDLMSG3PlcAdpRoutingTableEntry::SetRouteCost(unsigned short value)
 
 unsigned char CGXDLMSG3PlcAdpRoutingTableEntry::GetHopCount()
 {
-  return m_HopCount
+  return m_HopCount;
 }
 
 void CGXDLMSG3PlcAdpRoutingTableEntry::SetHopCount(unsigned char value)
@@ -78,7 +79,7 @@ void CGXDLMSG3PlcAdpRoutingTableEntry::SetHopCount(unsigned char value)
 
 unsigned char CGXDLMSG3PlcAdpRoutingTableEntry::GetWeakLinkCount()
 {
-  return m_WeakLinkCount
+  return m_WeakLinkCount;
 }
 
 void CGXDLMSG3PlcAdpRoutingTableEntry::SetWeakLinkCount(unsigned char value)
@@ -88,7 +89,7 @@ void CGXDLMSG3PlcAdpRoutingTableEntry::SetWeakLinkCount(unsigned char value)
 
 unsigned short CGXDLMSG3PlcAdpRoutingTableEntry::GetValidTime()
 {
-  return m_ValidTime
+  return m_ValidTime;
 }
 
 void CGXDLMSG3PlcAdpRoutingTableEntry::SetValidTime(unsigned short value)

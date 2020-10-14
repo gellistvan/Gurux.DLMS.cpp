@@ -456,38 +456,38 @@ int CGXDLMSG3PlcMacSetup::GetValue(CGXDLMSSettings& settings, CGXDLMSValueEventA
           CGXDLMSVariant element;
           element.vt = DLMS_DATA_TYPE_STRUCTURE;
 
-          CGXDLMSVariant short_address;
-          short_address.uiVal = it->GetShortAddress();
+          CGXDLMSVariant l_ShortAddress;
+          l_ShortAddress.uiVal = (*it)->GetShortAddress();
 
           CGXDLMSVariant l_PayloadModulationScheme;
-          l_PayloadModulationScheme.boolVal = it->GetPayloadModulationScheme();
+          l_PayloadModulationScheme.boolVal = (*it)->GetPayloadModulationScheme();
 
           CGXDLMSVariant l_ToneMap;
-          l_ToneMap.strVal = it->GetToneMap();
+          l_ToneMap.strVal = (*it)->GetToneMap();
 
           CGXDLMSVariant l_Modulation;
-          l_Modulation.uiVal = it->GetModulation();
+          l_Modulation.uiVal = (*it)->GetModulation();
 
           CGXDLMSVariant l_TxGain;
-          l_TxGain.cVal = it->GetTxGain();
+          l_TxGain.cVal = (*it)->GetTxGain();
 
           CGXDLMSVariant l_TxRes;
-          l_TxRes.bVal = it->GetTxRes();
+          l_TxRes.bVal = (*it)->GetTxRes();
 
           CGXDLMSVariant l_TxCoeff;
-          l_TxCoeff.strVal = it->GetTxCoeff();
+          l_TxCoeff.strVal = (*it)->GetTxCoeff();
 
           CGXDLMSVariant l_Lqi;
-          l_Lqi.bVal = it->GetLqi();
+          l_Lqi.bVal = (*it)->GetLqi();
 
           CGXDLMSVariant l_PhaseDifferencial;
-          l_PhaseDifferencial.cVal = it->GetPhaseDifferencial();
+          l_PhaseDifferencial.cVal = (*it)->GetPhaseDifferencial();
 
           CGXDLMSVariant l_TmrValidTime;
-          l_TmrValidTime.bVal = it->GetTmrValidTime();
+          l_TmrValidTime.bVal = (*it)->GetTmrValidTime();
 
           CGXDLMSVariant l_NeighbourValidTime;
-          l_NeighbourValidTime.bVal = it->GetNeighbourValidTime();
+          l_NeighbourValidTime.bVal = (*it)->GetNeighbourValidTime();
 
           element.Arr.push_back(l_ShortAddress);
           element.Arr.push_back(l_PayloadModulationScheme);

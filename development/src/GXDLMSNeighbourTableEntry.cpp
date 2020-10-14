@@ -33,11 +33,11 @@
 //---------------------------------------------------------------------------
 
 #include "../include/GXDLMSNeighbourTableElement.h"
-
+#include <sstream>
 
 void CGXDLMSNeighbourTableElement::SetShortAddress(unsigned short value)
 {
-    m_ShortAddress = value
+    m_ShortAddress = value;
 }
 
 unsigned short CGXDLMSNeighbourTableElement::GetShortAddress()
@@ -47,7 +47,7 @@ unsigned short CGXDLMSNeighbourTableElement::GetShortAddress()
 
 void CGXDLMSNeighbourTableElement::SetPayloadModulationScheme(bool value)
 {
-    m_PayloadModulationScheme = value
+    m_PayloadModulationScheme = value;
 }
 
 bool CGXDLMSNeighbourTableElement::GetPayloadModulationScheme()
@@ -57,7 +57,7 @@ bool CGXDLMSNeighbourTableElement::GetPayloadModulationScheme()
 
 void CGXDLMSNeighbourTableElement::SetToneMap(std::string value)
 {
-    m_ToneMap = value
+    m_ToneMap = value;
 }
 
 std::string CGXDLMSNeighbourTableElement::GetToneMap()
@@ -67,7 +67,7 @@ std::string CGXDLMSNeighbourTableElement::GetToneMap()
 
 void CGXDLMSNeighbourTableElement::SetModulation(unsigned short value)
 {
-    m_Modulation = value
+    m_Modulation = value;
 }
 
 unsigned short CGXDLMSNeighbourTableElement::GetModulation()
@@ -77,7 +77,7 @@ unsigned short CGXDLMSNeighbourTableElement::GetModulation()
 
 void CGXDLMSNeighbourTableElement::SetTxGain(char value)
 {
-    m_TxGain = value
+    m_TxGain = value;
 }
 
 char CGXDLMSNeighbourTableElement::GetTxGain()
@@ -87,7 +87,7 @@ char CGXDLMSNeighbourTableElement::GetTxGain()
 
 void CGXDLMSNeighbourTableElement::SetTxRes(unsigned char value)
 {
-    m_TxRes = value
+    m_TxRes = value;
 }
 
 unsigned char CGXDLMSNeighbourTableElement::GetTxRes()
@@ -97,7 +97,7 @@ unsigned char CGXDLMSNeighbourTableElement::GetTxRes()
 
 void CGXDLMSNeighbourTableElement::SetTxCoeff(std::string value)
 {
-    m_TxCoeff = value
+    m_TxCoeff = value;
 }
 
 std::string CGXDLMSNeighbourTableElement::GetTxCoeff()
@@ -107,7 +107,7 @@ std::string CGXDLMSNeighbourTableElement::GetTxCoeff()
 
 void CGXDLMSNeighbourTableElement::SetLqi(unsigned char value)
 {
-    m_Lqi = value
+    m_Lqi = value;
 }
 
 unsigned char CGXDLMSNeighbourTableElement::GetLqi()
@@ -117,7 +117,7 @@ unsigned char CGXDLMSNeighbourTableElement::GetLqi()
 
 void CGXDLMSNeighbourTableElement::SetPhaseDifferencial(char value)
 {
-    m_PhaseDifferencial = value
+    m_PhaseDifferencial = value;
 }
 
 char CGXDLMSNeighbourTableElement::GetPhaseDifferencial()
@@ -127,7 +127,7 @@ char CGXDLMSNeighbourTableElement::GetPhaseDifferencial()
 
 void CGXDLMSNeighbourTableElement::SetTmrValidTime(unsigned char value)
 {
-    m_TmrValidTime = value
+    m_TmrValidTime = value;
 }
 
 unsigned char CGXDLMSNeighbourTableElement::GetTmrValidTime()
@@ -137,7 +137,7 @@ unsigned char CGXDLMSNeighbourTableElement::GetTmrValidTime()
 
 void CGXDLMSNeighbourTableElement::SetNeighbourValidTime(unsigned char value)
 {
-    m_NeighbourValidTime = value
+    m_NeighbourValidTime = value;
 }
 
 unsigned char CGXDLMSNeighbourTableElement::GetNeighbourValidTime()

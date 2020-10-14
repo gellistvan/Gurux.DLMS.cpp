@@ -32,39 +32,47 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSG3PLCADPROUTINGTABLEENTRY_H
-#define GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#include "../include/GXDLMSG3PlcAdpBroadcastLogTableEntry.h"
 
-#include <string>
+#include <sstream>
 
-class CGXDLMSG3PlcAdpRoutingTableEntry
+unsigned short CGXDLMSG3PlcAdpBroadcastLogTableEntry::GetSourceAddress()
 {
-  unsigned short m_DestinationAddress;
-  unsigned short m_NextHopAddress;
-  unsigned short m_RouteCost;
-  unsigned char m_HopCount;
-  unsigned char m_WeakLinkCount;
-  unsigned short m_ValidTime;
+  return m_SourceAddress;
+}
 
-public:
-  unsigned short GetDestinationAddress();
-  void SetDestinationAddress(unsigned short value);
+void CGXDLMSG3PlcAdpBroadcastLogTableEntry::SetSourceAddress(unsigned short value)
+{
+  m_SourceAddress = value;
+}
 
-  unsigned short GetNextHopAddress();
-  void SetNextHopAddress(unsigned short value);
+unsigned char CGXDLMSG3PlcAdpBroadcastLogTableEntry::GetSequenceNumber()
+{
+  return m_SequenceNumber;
+}
 
-  unsigned short GetRouteCost();
-  void SetRouteCost(unsigned short value);
+void CGXDLMSG3PlcAdpBroadcastLogTableEntry::SetSequenceNumber(unsigned char value)
+{
+  m_SequenceNumber = value;
+}
 
-  unsigned char GetHopCount();
-  void SetHopCount(unsigned char value);
+unsigned short CGXDLMSG3PlcAdpBroadcastLogTableEntry::GetTimeToLive()
+{
+  return m_TimeToLiveGet;
+}
 
-  unsigned char GetWeakLinkCount();
-  void SetWeakLinkCount(unsigned char value);
+void CGXDLMSG3PlcAdpBroadcastLogTableEntry::SetTimeToLive(unsigned short value)
+{
+  m_TimeToLive = value;
+}
 
-  unsigned short GetValidTime();
-  void SetValidTime(unsigned short value);
+std::string CGXDLMSG3PlcAdpBroadcastLogTableEntry::ToString()
+{
+  std::stringstream sb;
 
-  std::string ToString();
-};
-#endif //GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+  sb << m_SourceAddress << " ";
+  sb << m_SequenceNumber << " ";
+  sb << m_TimeToLive;
+
+  return sb.str();
+}

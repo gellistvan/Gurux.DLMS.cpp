@@ -32,39 +32,22 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSG3PLCADPROUTINGTABLEENTRY_H
-#define GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#include "../include/GXDLMSG3PlcAdpGroupTableEntry.h"
 
-#include <string>
-
-class CGXDLMSG3PlcAdpRoutingTableEntry
+#include <sstream>
+unsigned short CGXDLMSG3PlcAdpGroupTableEntry::GetGroupAddress()
 {
-  unsigned short m_DestinationAddress;
-  unsigned short m_NextHopAddress;
-  unsigned short m_RouteCost;
-  unsigned char m_HopCount;
-  unsigned char m_WeakLinkCount;
-  unsigned short m_ValidTime;
+  return m_GroupAddress;
+}
 
-public:
-  unsigned short GetDestinationAddress();
-  void SetDestinationAddress(unsigned short value);
+void CGXDLMSG3PlcAdpGroupTableEntry::SetGroupAddress (unsigned short value)
+{
+  m_GroupAddress = value;
+}
 
-  unsigned short GetNextHopAddress();
-  void SetNextHopAddress(unsigned short value);
-
-  unsigned short GetRouteCost();
-  void SetRouteCost(unsigned short value);
-
-  unsigned char GetHopCount();
-  void SetHopCount(unsigned char value);
-
-  unsigned char GetWeakLinkCount();
-  void SetWeakLinkCount(unsigned char value);
-
-  unsigned short GetValidTime();
-  void SetValidTime(unsigned short value);
-
-  std::string ToString();
-};
-#endif //GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+std::string CGXDLMSG3PlcAdpGroupTableEntry::ToString()
+{
+  std::stringstream sb;
+  sb << m_GroupAddress;
+  return sb.str();
+)

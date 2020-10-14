@@ -32,39 +32,34 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSG3PLCADPROUTINGTABLEENTRY_H
-#define GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#ifndef GXDLMSG3PLCADPCONTEXTINFORMATIONTABLEENTRY_H
+#define GXDLMSG3PLCADPCONTEXTINFORMATIONTABLEENTRY_H
 
 #include <string>
-
-class CGXDLMSG3PlcAdpRoutingTableEntry
+class CGXDLMSG3PlcAdpContextInformationTableEntry
 {
-  unsigned short m_DestinationAddress;
-  unsigned short m_NextHopAddress;
-  unsigned short m_RouteCost;
-  unsigned char m_HopCount;
-  unsigned char m_WeakLinkCount;
-  unsigned short m_ValidTime;
+    std::string m_Cid;
+    unsigned char m_ContextLength;
+    std::string m_Context;
+    bool m_C;
+    unsigned short m_ValidLifetime;
 
 public:
-  unsigned short GetDestinationAddress();
-  void SetDestinationAddress(unsigned short value);
+    std::string GetCid();
+    void SetCid(std::string value);
 
-  unsigned short GetNextHopAddress();
-  void SetNextHopAddress(unsigned short value);
+    unsigned char GetContextLength();
+    void SetContextLength(unsigned char value);
 
-  unsigned short GetRouteCost();
-  void SetRouteCost(unsigned short value);
+    std::string GetContext();
+    void SetContext(std::string value);
 
-  unsigned char GetHopCount();
-  void SetHopCount(unsigned char value);
+    bool GetC();
+    void SetC(bool value);
 
-  unsigned char GetWeakLinkCount();
-  void SetWeakLinkCount(unsigned char value);
+    unsigned short GetValidLifetime();
+    void SetValidLifetime(unsigned short value);
 
-  unsigned short GetValidTime();
-  void SetValidTime(unsigned short value);
-
-  std::string ToString();
+    std::string ToString();
 };
-#endif //GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#endif //GXDLMSG3PLCADPCONTEXTINFORMATIONTABLEENTRY_H

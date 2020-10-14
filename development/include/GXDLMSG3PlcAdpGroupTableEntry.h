@@ -32,39 +32,19 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSG3PLCADPROUTINGTABLEENTRY_H
-#define GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#ifndef GXDLMSG3PLCADPGROUPTABLEENTRY_H
+#define GXDLMSG3PLCADPGROUPTABLEENTRY_H
 
 #include <string>
 
-class CGXDLMSG3PlcAdpRoutingTableEntry
+class CGXDLMSG3PlcAdpGroupTableEntry
 {
-  unsigned short m_DestinationAddress;
-  unsigned short m_NextHopAddress;
-  unsigned short m_RouteCost;
-  unsigned char m_HopCount;
-  unsigned char m_WeakLinkCount;
-  unsigned short m_ValidTime;
-
+  unsigned short m_GroupAddress;
 public:
-  unsigned short GetDestinationAddress();
-  void SetDestinationAddress(unsigned short value);
 
-  unsigned short GetNextHopAddress();
-  void SetNextHopAddress(unsigned short value);
-
-  unsigned short GetRouteCost();
-  void SetRouteCost(unsigned short value);
-
-  unsigned char GetHopCount();
-  void SetHopCount(unsigned char value);
-
-  unsigned char GetWeakLinkCount();
-  void SetWeakLinkCount(unsigned char value);
-
-  unsigned short GetValidTime();
-  void SetValidTime(unsigned short value);
+  unsigned short GetGroupAddress();
+  void SetGroupAddress (unsigned short value);
 
   std::string ToString();
 };
-#endif //GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#endif //GXDLMSG3PLCADPGROUPTABLEENTRY_H

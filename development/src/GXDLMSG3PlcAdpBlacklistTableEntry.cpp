@@ -32,39 +32,33 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSG3PLCADPROUTINGTABLEENTRY_H
-#define GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+#include "../include/GXDLMSG3PlcAdpBlacklistTableEntry.h"
 
-#include <string>
+#include <sstream>
 
-class CGXDLMSG3PlcAdpRoutingTableEntry
+unsigned short CGXDLMSG3PlcAdpBlacklistTableEntry::GetBlacklistedNeighbourAddress()
 {
-  unsigned short m_DestinationAddress;
-  unsigned short m_NextHopAddress;
-  unsigned short m_RouteCost;
-  unsigned char m_HopCount;
-  unsigned char m_WeakLinkCount;
-  unsigned short m_ValidTime;
+  return m_BlacklistedNeighbourAddress;
+}
 
-public:
-  unsigned short GetDestinationAddress();
-  void SetDestinationAddress(unsigned short value);
+void CGXDLMSG3PlcAdpBlacklistTableEntry::SetBlacklistedNeighbourAddress(unsigned short value)
+{
+  m_BlacklistedNeighbourAddress = value;
+}
 
-  unsigned short GetNextHopAddress();
-  void SetNextHopAddress(unsigned short value);
+unsigned short CGXDLMSG3PlcAdpBlacklistTableEntry::GetValidTime()
+{
+  return m_ValidTime;
+}
 
-  unsigned short GetRouteCost();
-  void SetRouteCost(unsigned short value);
+void CGXDLMSG3PlcAdpBlacklistTableEntry::SetValidTime(unsigned short value)
+{
+  m_ValidTime = value;
+}
 
-  unsigned char GetHopCount();
-  void SetHopCount(unsigned char value);
-
-  unsigned char GetWeakLinkCount();
-  void SetWeakLinkCount(unsigned char value);
-
-  unsigned short GetValidTime();
-  void SetValidTime(unsigned short value);
-
-  std::string ToString();
-};
-#endif //GXDLMSG3PLCADPROUTINGTABLEENTRY_H
+std::string ToString()
+{
+  std::stringstream sb;
+  sb << m_BlacklistedNeighbourAddress << " " << m_ValidTime;
+  return sb.str();
+}
