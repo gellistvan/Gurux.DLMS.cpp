@@ -396,7 +396,8 @@ int CGXDLMSG3PlcMacSetup::GetDataType(int index, DLMS_DATA_TYPE& type)
       type = DLMS_DATA_TYPE_UINT8;
       break;
     case 11:
-        type = DLMS_DATA_TYPE_ARRAY;
+      type = DLMS_DATA_TYPE_ARRAY;
+      break;
     default:
         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

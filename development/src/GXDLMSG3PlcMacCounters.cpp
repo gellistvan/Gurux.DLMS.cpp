@@ -267,6 +267,7 @@ int CGXDLMSG3PlcMacCounters::GetDataType(int index, DLMS_DATA_TYPE& type)
     case 9:
     case 10:
         type = DLMS_DATA_TYPE_UINT32;
+        break;
     default:
         ret = DLMS_ERROR_CODE_INVALID_PARAMETER;
     }

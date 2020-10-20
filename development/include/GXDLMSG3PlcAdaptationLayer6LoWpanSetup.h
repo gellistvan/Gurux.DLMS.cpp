@@ -68,7 +68,7 @@ class CGXDLMSG3PlcAdaptationLayer6LoWpanSetup : public CGXDLMSObject
   std::vector<CGXDLMSG3PlcAdpBlacklistTableEntry*> m_BlacklistTable;
   std::vector<CGXDLMSG3PlcAdpBroadcastLogTableEntry*> m_BroadcastLogTable;
   std::vector<CGXDLMSG3PlcAdpGroupTableEntry*> m_GroupTable;
-  unsigned short m_MaxJoinWaitTime;
+  unsigned char m_MaxJoinWaitTime;
   unsigned char m_PathDiscoveryTime;
   unsigned char m_ActiveKeyIndex;
   unsigned char m_MetricType;
@@ -111,8 +111,8 @@ public:
   std::vector<CGXDLMSG3PlcAdpGroupTableEntry*> GetGroupTable();
   void SetGroupTable(std::vector<CGXDLMSG3PlcAdpGroupTableEntry*> value);
 
-  unsigned short GetMaxJoinWaitTime();
-  void SetMaxJoinWaitTime(unsigned short value);
+  unsigned char GetMaxJoinWaitTime();
+  void SetMaxJoinWaitTime(unsigned char value);
 
   unsigned char GetPathDiscoveryTime();
   void SetPathDiscoveryTime(unsigned char value);

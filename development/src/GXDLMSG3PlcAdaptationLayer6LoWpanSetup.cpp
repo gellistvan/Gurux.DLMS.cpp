@@ -118,7 +118,7 @@ void CGXDLMSG3PlcAdaptationLayer6LoWpanSetup::SetBrdcastLogTableEntryTtl(unsigne
   m_BrdcastLogTableEntryTtl = value;
 }
 
-unsigned short CGXDLMSG3PlcAdaptationLayer6LoWpanSetup::GetMaxJoinWaitTime()
+unsigned char CGXDLMSG3PlcAdaptationLayer6LoWpanSetup::GetMaxJoinWaitTime()
 {
   return m_MaxJoinWaitTime;
 }
@@ -145,7 +145,7 @@ void CGXDLMSG3PlcAdaptationLayer6LoWpanSetup::SetPrefixTable(const std::vector<s
   m_PrefixTable = value;
 }
 
-void CGXDLMSG3PlcAdaptationLayer6LoWpanSetup::SetMaxJoinWaitTime(unsigned short value)
+void CGXDLMSG3PlcAdaptationLayer6LoWpanSetup::SetMaxJoinWaitTime(unsigned char value)
 {
   m_MaxJoinWaitTime = value;
 }
