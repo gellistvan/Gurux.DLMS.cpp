@@ -65,12 +65,12 @@ std::string CGXDLMSNeighbourTableElement::GetToneMap()
     return m_ToneMap;
 }
 
-void CGXDLMSNeighbourTableElement::SetModulation(unsigned short value)
+void CGXDLMSNeighbourTableElement::SetModulation(unsigned char value)
 {
     m_Modulation = value;
 }
 
-unsigned short CGXDLMSNeighbourTableElement::GetModulation()
+unsigned char CGXDLMSNeighbourTableElement::GetModulation()
 {
     return m_Modulation;
 }

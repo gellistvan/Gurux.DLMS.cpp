@@ -42,7 +42,7 @@ class CGXDLMSNeighbourTableElement
     unsigned short m_ShortAddress;
     bool m_PayloadModulationScheme;
     std::string m_ToneMap;
-    unsigned short m_Modulation;
+    unsigned char m_Modulation;
     char m_TxGain;
     unsigned char m_TxRes;
     std::string m_TxCoeff;
@@ -61,8 +61,8 @@ public:
     void SetToneMap(std::string value);
     std::string GetToneMap();
 
-    void SetModulation(unsigned short value);
-    unsigned short GetModulation();
+    void SetModulation(unsigned char value);
+    unsigned char GetModulation();
 
     void SetTxGain(char value);
     char GetTxGain();
