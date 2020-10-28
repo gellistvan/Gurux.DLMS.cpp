@@ -32,8 +32,8 @@
 // Full text may be retrieved at http://www.gnu.org/licenses/gpl-2.0.txt
 //---------------------------------------------------------------------------
 
-#ifndef GXDLMSPrimeNbOfdmPlcMacCounters_H
-#define GXDLMSPrimeNbOfdmPlcMacCounters_H
+#ifndef GXDLMSG3PlcMacCounters_H
+#define GXDLMSG3PlcMacCounters_H
 
 #include "GXDLMSObject.h"
 
@@ -41,7 +41,7 @@
 Online help:
 http://www.gurux.fi/Gurux.DLMS.Objects.GXDLMSPrimeNbOfdmPlcMacCounters
 */
-class CGXDLMSPrimeNbOfdmPlcMacCounters : public CGXDLMSObject
+class CGXDLMSG3PlcMacCounters : public CGXDLMSObject
 {
   /*
   * Count of successfully transmitted MSDUs.
@@ -67,21 +67,32 @@ class CGXDLMSPrimeNbOfdmPlcMacCounters : public CGXDLMSObject
   */
   unsigned long m_CsmaFailCount;
   /*
-  * Count of number of times this node has to back off SCP transmission due
-  * to channel busy state.
+  * Count of number of CSMA transmition with no ack response
   */
-  unsigned long m_CsmaChBusyCount;
+  unsigned long m_CsmaNoAckCount;
+  /*
+   * Count of PDUs with CRC error
+   */
+  unsigned long m_BadCrcCount;
+  /*
+   * Count of transmitted PDUs over broadcast
+   */
+  unsigned long m_TxDataBrdcastCount;
+  /*
+   * Count of received PDUs over broadcast
+   */
+  unsigned long m_RxDataBrdcastCount;
 
   int Invoke(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 public:
   //Constructor.
-  CGXDLMSPrimeNbOfdmPlcMacCounters();
+  CGXDLMSG3PlcMacCounters();
 
   //SN Constructor.
-  CGXDLMSPrimeNbOfdmPlcMacCounters(std::string ln, unsigned short sn);
+  CGXDLMSG3PlcMacCounters(std::string ln, unsigned short sn);
 
   //LN Constructor.
-  CGXDLMSPrimeNbOfdmPlcMacCounters(std::string ln);
+  CGXDLMSG3PlcMacCounters(std::string ln);
 
   /*
    * Returns Count of successfully transmitted MSDUs.
@@ -143,17 +154,51 @@ public:
   void SetCsmaFailCount(unsigned int value);
 
   /*
-   * Returns Count of number of times this node has to back off SCP
-   *         transmission due to channel busy state.
+   * Returns Count of PDUs with no ack received
    */
-  unsigned int GetCsmaChBusyCount();
+  unsigned int GetCSMANoAckCount();
 
   /*
    * value:
-   *            Count of number of times this node has to back off SCP
-   *            transmission due to channel busy state.
+   *            Count of PDUs with no ack received.
    */
-  void SetCsmaChBusyCount(unsigned int value);
+  void SetCSMANoAckCount(unsigned int value);
+
+  /*
+   * Returns Count of successfully MSDUs with bad CRC data
+   */
+  unsigned int GetBadCRCCount();
+
+  /*
+   * value:
+   *            Count of successfully MSDUs with bad CRC data
+   */
+  void SetBadCRCCount(unsigned int value);
+
+  /*
+   * Returns Count of successfully transmitted MSDUs over broadcast.
+   */
+  unsigned int GetTxDataBrdcastCount();
+
+  /*
+   * value:
+   *            Count of successfully transmitted MSDUs over broadcast.
+   */
+  void SetTxDataBrdcastCount(unsigned int value);
+
+  /*
+   * Returns Count of successfully received MSDUs whose destination address
+   *         was this broadcast.
+   */
+  unsigned int GetRxDataBrdcastCount();
+
+  /*
+   * value:
+   *            Count of successfully received MSDUs whose destination address
+   *            was broadcast.
+   */
+  void SetRxDataBrdcastCount(unsigned int value);
+
 
   //Reset the values.
   int Reset(CGXDLMSClient* client, std::vector<CGXByteBuffer>& reply);
@@ -185,4 +230,4 @@ public:
   // Set value of given attribute.
   int SetValue(CGXDLMSSettings& settings, CGXDLMSValueEventArg& e);
 };
-#endif //GXDLMSPrimeNbOfdmPlcMacCounters_H
+#endif //GXDLMSG3PlcMacCounters_H

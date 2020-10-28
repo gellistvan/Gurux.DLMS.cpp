@@ -1204,6 +1204,9 @@ const char* CGXDLMSConverter::ToString(DLMS_OBJECT_TYPE type)
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
         str = "GXDLMSPrimeNbOfdmPlcApplicationsIdentification";
         break;
+    case DLMS_OBJECT_TYPE_G3_PLC_MAC_COUNTERS:
+        str = "GXDLMSG3PlcMacCounters";
+        break;
     default:
         str = "Manufacture spesific.";
         break;

@@ -86,6 +86,8 @@
 #include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
 #include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
 #include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
+#include "../include/GXDLMSG3PlcMacCounters.h"
+
 
 // Reserved for internal use.
 CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
@@ -208,6 +210,8 @@ CGXDLMSObject* CGXDLMSObjectFactory::CreateObject(DLMS_OBJECT_TYPE type)
         return new CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData();
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
         return new CGXDLMSPrimeNbOfdmPlcApplicationsIdentification();
+    case DLMS_OBJECT_TYPE_G3_PLC_MAC_COUNTERS:
+        return new CGXDLMSG3PlcMacCounters();
     default:
 #ifdef _DEBUG
         printf("Unknown object: %d\r\n", type);

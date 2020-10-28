@@ -85,6 +85,8 @@
 #include "../include/GXDLMSPrimeNbOfdmPlcMacCounters.h"
 #include "../include/GXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData.h"
 #include "../include/GXDLMSPrimeNbOfdmPlcApplicationsIdentification.h"
+#include "../include/GXDLMSG3PlcMacCounters.h"
+#include "../include/GXDLMSG3PlcMacSetup.h"
 
 CGXXmlWriter::CGXXmlWriter(FILE* f, bool skipDefaults)
 {
@@ -1398,6 +1400,65 @@ int SavePrimeNbOfdmPlcMacSetup(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacSet
     return ret;
 }
 
+int SaveG3PlcMacSetup(CGXXmlWriter* writer, CGXDLMSG3PlcMacSetup* obj)
+{
+    int ret;
+    // TODO
+    if ((ret = writer->WriteElementString("ShortAddress", obj->GetShortAddress())) != 0 ||
+        (ret = writer->WriteElementString("RcCoord", obj->GetRcCoord())) != 0 ||
+        (ret = writer->WriteElementString("PanId", obj->GetPanId())) != 0 ||
+        (ret = writer->WriteElementString("ToneMap", obj->GetToneMap())) != 0 ||
+        (ret = writer->WriteElementString("TmrTtl", obj->GetTmrTtl())) != 0 ||
+        (ret = writer->WriteElementString("MaxFrameRetries", obj->GetMaxFrameRetries())) != 0 ||
+        (ret = writer->WriteElementString("NeighbourTableEntryTtl", obj->GetNeighbourTableEntryTtl())) != 0)
+    {
+      return ret;
+    }
+
+    if ((ret = writer->WriteStartElement("NeighbourTable")) == 0)
+    {
+      std::vector<CGXDLMSNeighbourTableElement*> nt = obj->GetNeighbourTable();
+      for (std::vector<CGXDLMSNeighbourTableElement*>::iterator it = nt.begin(); it != nt.end(); ++it)
+      {
+        if ((ret = writer->WriteStartElement("NeighbourTableElement")) != 0 ||
+            (ret = writer->WriteElementString("ShortAddress", (*it)->GetShortAddress())) != 0 ||
+            (ret = writer->WriteElementString("PayloadModulationScheme", (*it)->GetPayloadModulationScheme())) != 0 ||
+            (ret = writer->WriteElementString("ToneMap", (*it)->GetToneMap())) != 0 ||
+            (ret = writer->WriteElementString("Modulation", (*it)->GetModulation())) != 0 ||
+            (ret = writer->WriteElementString("TxGain", (*it)->GetTxGain())) != 0 ||
+            (ret = writer->WriteElementString("TxRes", (*it)->GetTxRes())) != 0 ||
+            (ret = writer->WriteElementString("TxCoeff", (*it)->GetTxCoeff())) != 0 ||
+            (ret = writer->WriteElementString("Lqi", (*it)->GetLqi())) != 0 ||
+            (ret = writer->WriteElementString("PhaseDifferencial", (*it)->GetPhaseDifferencial())) != 0 ||
+            (ret = writer->WriteElementString("TmrValidTime", (*it)->GetTmrValidTime())) != 0 ||
+            (ret = writer->WriteElementString("NeighbourValidTime", (*it)->GetNeighbourValidTime())) != 0 ||
+            (ret = writer->WriteEndElement()) != 0)
+        {
+          break;
+        }
+      }
+      //Entries
+      if (ret == 0)
+      {
+        ret = writer->WriteEndElement();
+      }
+    }
+    if((ret = writer->WriteElementString("HighPriorityWindowSize", obj->GetHighPriorityWindowSize())) != 0 ||
+        (ret = writer->WriteElementString("CsmaFairnessLimit", obj->GetCsmaFairnessLimit())) != 0 ||
+        (ret = writer->WriteElementString("BeaconRandimizationWindowLength", obj->GetBeaconRandimizationWindowLength())) != 0 ||
+        (ret = writer->WriteElementString("A", obj->GetA())) != 0 ||
+        (ret = writer->WriteElementString("K", obj->GetK())) != 0 ||
+        (ret = writer->WriteElementString("MinCwAttempts", obj->GetMinCwAttempts())) != 0 ||
+        (ret = writer->WriteElementString("CenelecLegacyMode", obj->GetCenelecLegacyMode())) != 0 ||
+        (ret = writer->WriteElementString("MaxBe", obj->GetMaxBe())) != 0 ||
+        (ret = writer->WriteElementString("MaxCsmaBackoffs", obj->GetMaxCsmaBackoffs())) != 0 ||
+        (ret = writer->WriteElementString("MinBe", obj->GetMinBe())) != 0)
+    {
+
+    }
+    return ret;
+}
+
 int SavePrimeNbOfdmPlcMacFunctionalParameters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacFunctionalParameters* obj)
 {
     int ret;
@@ -1434,6 +1495,25 @@ int SavePrimeNbOfdmPlcMacCounters(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMac
     }
     return ret;
     return 0;
+}
+
+int SaveG3PlcMacCounters(CGXXmlWriter* writer, CGXDLMSG3PlcMacCounters* obj)
+{
+    int ret = 0;
+
+    if ((ret = writer->WriteElementString("TxDataPktCount", obj->GetTxDataPktCount())) != 0 ||
+        (ret = writer->WriteElementString("RxDataPktCount", obj->GetRxDataPktCount())) != 0 ||
+        (ret = writer->WriteElementString("TxCtrlPktCount", obj->GetTxCtrlPktCount())) != 0 ||
+        (ret = writer->WriteElementString("RxCtrlPktCount", obj->GetRxCtrlPktCount())) != 0 ||
+        (ret = writer->WriteElementString("CsmaFailCount", obj->GetCsmaFailCount())) != 0 ||
+        (ret = writer->WriteElementString("CsmaNoAckCount", obj->GetCSMANoAckCount())) != 0 ||
+        (ret = writer->WriteElementString("BadCRCCount", obj->GetBadCRCCount())) != 0 ||
+        (ret = writer->WriteElementString("TxDataBrdcastCount", obj->GetTxDataBrdcastCount())) != 0 ||
+        (ret = writer->WriteElementString("RxDataBrdcastCount", obj->GetRxDataBrdcastCount())) != 0)
+    {
+
+    }
+    return ret;
 }
 
 int SaveMulticastEntries(CGXXmlWriter* writer, CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData* obj)
@@ -2217,6 +2297,10 @@ int CGXXmlWriter::Save(CGXDLMSObject* obj)
         return SavePrimeNbOfdmPlcMacNetworkAdministrationData(this, (CGXDLMSPrimeNbOfdmPlcMacNetworkAdministrationData*)obj);
     case DLMS_OBJECT_TYPE_PRIME_NB_OFDM_PLC_APPLICATIONS_IDENTIFICATION:
         return SavePrimeNbOfdmPlcApplicationsIdentification(this, (CGXDLMSPrimeNbOfdmPlcApplicationsIdentification*)obj);
+    case DLMS_OBJECT_TYPE_G3_PLC_MAC_COUNTERS:
+        return SaveG3PlcMacCounters(this, (CGXDLMSG3PlcMacCounters*)obj);
+    case DLMS_OBJECT_TYPE_G3_PLC_MAC_SETUP:
+        return SaveG3PlcMacSetup(this, (CGXDLMSG3PlcMacSetup*)obj);
     default:
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
