@@ -366,6 +366,18 @@ public:
         CGXDLMSSettings& settings,
         CGXReplyData& reply);
 
+  /**
+    * Handle event notification get data from block and/or update error status.
+    *
+    * @param settings
+    *            DLMS settings.
+    * @param reply
+    *            Received data from the client.
+    */
+    static int HandleEventNotification(
+        CGXDLMSSettings& settings,
+        CGXReplyData& reply);
+
     /////////////////////////////////////////////////////////////////////////////
     // Handle write response and update error status.
     /////////////////////////////////////////////////////////////////////////////

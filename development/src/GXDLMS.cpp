@@ -2109,6 +2109,68 @@ int CGXDLMS::HandleDataNotification(
     return 0;
 }
 
+/**
+    * Handle event notification get data from block and/or update error status.
+    *
+    * @param settings
+    *            DLMS settings.
+    * @param reply
+    *            Received data from the client.
+    */
+int CGXDLMS::HandleEventNotification(
+    CGXDLMSSettings& settings,
+    CGXReplyData& reply)
+{
+  unsigned char invokeId;
+  int ret;
+  CGXDLMSVariant attribute_descriptor, attribute_value;
+  CGXDLMSVariant class_id, logical_address, attribute_id;
+
+  //===================== Parse Attribute Descriptor
+  //Invoke ID and priority.
+  if ((ret = reply.GetData().GetUInt8(&invokeId)) != 0)
+  {
+    return ret;
+  }
+
+  reply.GetValue().vt = DLMS_DATA_TYPE_STRUCTURE;
+
+  if ((ret = reply.GetData().GetUInt16(&class_id.uiVal)) != 0)
+  {
+    return ret;
+  }
+  class_id.vt = DLMS_DATA_TYPE_UINT16;
+  attribute_descriptor.Arr.push_back(class_id);
+
+  CGXByteBuffer tmp;
+  tmp.Set(&reply.GetData(), reply.GetData().GetPosition(), 6U);
+  logical_address.Add(tmp.GetData(), 6U);
+  logical_address.vt = DLMS_DATA_TYPE_OCTET_STRING;
+  attribute_descriptor.Arr.push_back(logical_address);
+
+  if ((ret = reply.GetData().GetUInt8(&attribute_id.bVal)) != 0)
+  {
+    return ret;
+  }
+  attribute_id.vt = DLMS_DATA_TYPE_UINT8;
+  attribute_descriptor.Arr.push_back(attribute_id);
+  reply.GetValue().Arr.push_back(attribute_descriptor);
+
+  //===================== Parse Attribute Value
+  unsigned char data_type;
+  reply.GetData().GetUInt8(&data_type);
+  attribute_value.vt = (DLMS_DATA_TYPE) data_type;
+
+  if (attribute_value.vt == DLMS_DATA_TYPE_UINT32)
+  {
+    reply.GetData().GetUInt32(&attribute_value.ulVal);
+  }
+
+  reply.GetValue().Arr.push_back(attribute_value);
+
+  return DLMS_ERROR_CODE_OK;
+}
+
 int CGXDLMS::HandleSetResponse(
     CGXDLMSSettings& settings,
     CGXReplyData& data)
@@ -2714,6 +2776,7 @@ int CGXDLMS::GetPdu(
             // Client handles this.
             break;
         case DLMS_COMMAND_EVENT_NOTIFICATION:
+            ret = HandleEventNotification(settings, data);
             // Client handles this.
             break;
         case DLMS_COMMAND_INFORMATION_REPORT:
@@ -2857,7 +2920,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         {
             return ret;
         }
-        if (ret == DLMS_ERROR_CODE_FALSE && target->IsComplete())
+        if (ret == DLMS_ERROR_CODE_FALSE && notify->IsComplete())
         {
             if (notify != NULL)
             {
@@ -3685,7 +3748,7 @@ int CGXDLMS::CheckWrapperAddress(
         }
         // Check that server addresses match.
         if (settings.GetServerAddress() != 0
-            && settings.GetServerAddress() != value)
+            && settings.GetServerAddress() == value)
         {
             if (notify == NULL)
             {
@@ -3704,7 +3767,7 @@ int CGXDLMS::CheckWrapperAddress(
         }
         // Check that client addresses match.
         if (settings.GetClientAddress() != 0
-            && settings.GetClientAddress() != value)
+            && settings.GetClientAddress() == value)
         {
             if (notify != NULL)
             {

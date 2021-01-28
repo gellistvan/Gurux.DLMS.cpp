@@ -72,13 +72,8 @@ void ListenerThread(void* pVoid)
     char tmp[10];
     CGXByteBuffer bb;
     bb.Capacity(2048);
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-    int len;
-    int AddrLen = sizeof(add);
-#else //If Linux
     socklen_t len;
     socklen_t AddrLen = sizeof(add);
-#endif
     struct sockaddr_in client;
     memset(&client, 0, sizeof(client));
     //Get buffer data
@@ -100,23 +95,14 @@ void ListenerThread(void* pVoid)
         {
             if ((ret = getpeername(socket, (sockaddr*)&add, &AddrLen)) == -1)
             {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-                closesocket(socket);
-                socket = INVALID_SOCKET;
-#else //If Linux
                 close(socket);
                 socket = -1;
-#endif
                 continue;
                 //Notify error.
             }
             senderInfo = inet_ntoa(add.sin_addr);
             senderInfo.append(":");
-#if _MSC_VER > 1000
-            _ltoa_s(add.sin_port, tmp, 10, 10);
-#else
             sprintf(tmp, "%d", add.sin_port);
-#endif
             senderInfo.append(tmp);
             while (server->IsConnected())
             {
@@ -126,39 +112,24 @@ void ListenerThread(void* pVoid)
                     bb.Capacity() - bb.GetSize(), 0)) == -1)
                 {
                     bb.SetSize(0);
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-                    closesocket(socket);
-                    socket = INVALID_SOCKET;
-#else //If Linux
                     close(socket);
                     socket = -1;
-#endif
                     break;
                 }
                 //If client is closed the connection.
                 if (ret == 0)
                 {
                     bb.SetSize(0);
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-                    closesocket(socket);
-                    socket = INVALID_SOCKET;
-#else //If Linux
                     close(socket);
                     socket = -1;
-#endif
                     break;
                 }
                 bb.SetSize(bb.GetSize() + ret);
                 if ((ret = cl.GetData(bb, data, notify)) != 0 && ret != DLMS_ERROR_CODE_FALSE)
                 {
                     bb.SetSize(0);
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-                    closesocket(socket);
-                    socket = INVALID_SOCKET;
-#else //If Linux
                     close(socket);
                     socket = -1;
-#endif
                 }
 
                 // If all data is received.

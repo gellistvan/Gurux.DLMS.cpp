@@ -938,49 +938,17 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
     int len = data.GetSize();
     if (m_hComPort != INVALID_HANDLE_VALUE)
     {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-        DWORD sendSize = 0;
-        BOOL bRes = ::WriteFile(m_hComPort, data.GetData(), len, &sendSize, &m_osWrite);
-        if (!bRes)
-        {
-            COMSTAT comstat;
-            unsigned long RecieveErrors;
-            DWORD err = GetLastError();
-            //If error occurs...
-            if (err != ERROR_IO_PENDING)
-            {
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-            //Wait until data is actually sent
-            ret = WaitForSingleObject(m_osWrite.hEvent, m_WaitTime);
-            if (ret != 0)
-            {
-                DWORD err = GetLastError();
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-            //Read bytes in output buffer. Some USB converts require this.
-            if (!ClearCommError(m_hComPort, &RecieveErrors, &comstat))
-            {
-                return DLMS_ERROR_CODE_SEND_FAILED;
-            }
-        }
-#else //If Linux
         ret = write(m_hComPort, data.GetData(), len);
         if (ret != len)
         {
             printf("write failed %d\n", errno);
             return DLMS_ERROR_CODE_SEND_FAILED;
         }
-#endif
     }
     else if ((ret = send(m_socket, (const char*)data.GetData(), len, 0)) == -1)
     {
         //If error has occured
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-        printf("send failed %d\n", WSAGetLastError());
-#else
         printf("send failed %d\n", errno);
-#endif
         return DLMS_ERROR_CODE_SEND_FAILED;
     }
     // Loop until whole DLMS packet is received.
@@ -1033,11 +1001,7 @@ int CGXCommunication::ReadDLMSPacket(CGXByteBuffer& data, CGXReplyData& reply)
             len = RECEIVE_BUFFER_SIZE;
             if ((ret = recv(m_socket, (char*)m_Receivebuff, len, 0)) == -1)
             {
-#if defined(_WIN32) || defined(_WIN64)//If Windows
-                printf("recv failed %d\n", WSAGetLastError());
-#else
                 printf("recv failed %d\n", errno);
-#endif
                 return DLMS_ERROR_CODE_RECEIVE_FAILED;
             }
             bb.Set(m_Receivebuff, ret);
