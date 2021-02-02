@@ -2922,7 +2922,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         {
             return ret;
         }
-        if (ret == DLMS_ERROR_CODE_FALSE && notify->IsComplete())
+        if (ret == DLMS_ERROR_CODE_FALSE && target->IsComplete())
         {
             if (notify != NULL)
             {
@@ -3750,7 +3750,7 @@ int CGXDLMS::CheckWrapperAddress(
         }
         // Check that server addresses match.
         if (settings.GetServerAddress() != 0
-            && settings.GetServerAddress() == value)
+            && settings.GetServerAddress() != value)
         {
             if (notify == NULL)
             {
@@ -3769,7 +3769,7 @@ int CGXDLMS::CheckWrapperAddress(
         }
         // Check that client addresses match.
         if (settings.GetClientAddress() != 0
-            && settings.GetClientAddress() == value)
+            && settings.GetClientAddress() != value)
         {
             if (notify != NULL)
             {
