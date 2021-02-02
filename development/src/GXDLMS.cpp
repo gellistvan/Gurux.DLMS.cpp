@@ -39,6 +39,10 @@
 #include "../include/GXBytebuffer.h"
 #include "../include/GXDLMSTranslator.h"
 
+#include <iostream>
+
+using namespace std;
+
 static unsigned char CIPHERING_HEADER_SIZE = 7 + 12 + 3;
 //CRC table.
 static unsigned short FCS16Table[256] =
@@ -2121,6 +2125,8 @@ int CGXDLMS::HandleEventNotification(
     CGXDLMSSettings& settings,
     CGXReplyData& reply)
 {
+  cout <<"HandleEventNotification" << endl;
+	
   unsigned char invokeId;
   int ret;
   CGXDLMSVariant attribute_descriptor, attribute_value;
@@ -2130,15 +2136,20 @@ int CGXDLMS::HandleEventNotification(
   //Invoke ID and priority.
   if ((ret = reply.GetData().GetUInt8(&invokeId)) != 0)
   {
+	cout << "Retval invoke Id " << ret <<endl;
     return ret;
   }
+  std::cout <<"Invoke id: " << (int) invokeId << endl;
 
   reply.GetValue().vt = DLMS_DATA_TYPE_STRUCTURE;
 
   if ((ret = reply.GetData().GetUInt16(&class_id.uiVal)) != 0)
   {
+	cout << "Retval class id " << ret << endl;
     return ret;
   }
+  cout << "Class id: " << class_id.uiVal << endl;
+  
   class_id.vt = DLMS_DATA_TYPE_UINT16;
   attribute_descriptor.Arr.push_back(class_id);
 
@@ -2150,8 +2161,11 @@ int CGXDLMS::HandleEventNotification(
 
   if ((ret = reply.GetData().GetUInt8(&attribute_id.bVal)) != 0)
   {
+	cout << "Retval attribute id " << ret << endl;
     return ret;
   }
+  cout << "Attribute id: "<<attribute_id.bVal<<endl;
+  
   attribute_id.vt = DLMS_DATA_TYPE_UINT8;
   attribute_descriptor.Arr.push_back(attribute_id);
   attribute_descriptor.vt = DLMS_DATA_TYPE_STRUCTURE;
@@ -2166,9 +2180,16 @@ int CGXDLMS::HandleEventNotification(
   if (attribute_value.vt == DLMS_DATA_TYPE_UINT32)
   {
     reply.GetData().GetUInt32(&attribute_value.ulVal);
+	cout << "Value value type is uint32_t, value:" << attribute_value.ulVal <<endl;
+  }
+  else
+  {
+	cout << "Attribute value type: " << attribute_value.vt << endl;
   }
   attribute_value.vt = DLMS_DATA_TYPE_STRUCTURE;
   reply.GetValue().Arr.push_back(attribute_value);
+
+  cout << "Event parsing DONE" << endl;
 
   return DLMS_ERROR_CODE_OK;
 }
@@ -2657,6 +2678,7 @@ int CGXDLMS::GetPdu(
     int ret = DLMS_ERROR_CODE_OK;
     unsigned char ch;
     DLMS_COMMAND cmd = data.GetCommand();
+	cout << "Get PDU, command: " << data.GetCommand() << endl;
     // If header is not read yet or GBT message.
     if (cmd == DLMS_COMMAND_NONE)
     {
@@ -2918,27 +2940,32 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     }
     else if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_WRAPPER)
     {
+		cout << "Interface tye wrapper" <<endl;
         if ((ret = GetTcpData(settings, reply, data, notify)) != 0 && ret != DLMS_ERROR_CODE_FALSE)
         {
             return ret;
         }
         if (ret == DLMS_ERROR_CODE_FALSE && target->IsComplete())
         {
+			cout << "ErrorCodeFalse and isComplete"<<endl;
             if (notify != NULL)
             {
+				cout << "Notify is not null" << endl;
                 target = notify;
-            }
+            }			
             isNotify = true;
         }
     }
     else
     {
+		cout << "Interface type unknown" <<endl;
         // Invalid Interface type.
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     // If all data is not read yet.
     if (!target->IsComplete())
     {
+		cout << "Target is NOT complete. Exit." << endl;
         return DLMS_ERROR_CODE_FALSE;
     }
     GetDataFromFrame(reply, *target, settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC);
@@ -3508,11 +3535,13 @@ int CGXDLMS::GetTcpData(
     CGXReplyData& data,
     CGXReplyData* notify)
 {
+	cout << "GetTcpData" << endl;
     CGXReplyData* target = &data;
     int ret;
     // If whole frame is not received yet.
     if (buff.GetSize() - buff.GetPosition() < 8)
     {
+		cout << "Not complete" << endl;
         data.SetComplete(false);
         return DLMS_ERROR_CODE_OK;
     }
@@ -3529,6 +3558,7 @@ int CGXDLMS::GetTcpData(
         // Get version
         if ((ret = buff.GetUInt16(&value)) != 0)
         {
+			cout << "Could not read DLMS version" << endl;
             return DLMS_ERROR_CODE_OK;
         }
         if (value == 1)
@@ -3540,12 +3570,14 @@ int CGXDLMS::GetTcpData(
             }
             if (ret == DLMS_ERROR_CODE_FALSE)
             {
+				cout <<"CheckWrapperAddress detected notif" <<endl;
                 target = notify;
                 isData = false;
             }
             // Get length.
             if ((ret = buff.GetUInt16(&value)) != 0)
             {
+				cout << "Could not read length" <<endl;
                 return ret;
             }
 
@@ -3553,22 +3585,26 @@ int CGXDLMS::GetTcpData(
             target->SetComplete(complete);
             if (!complete)
             {
+				cout <<"PDU is not complete " << pos <<endl;
                 buff.SetPosition(pos);
                 return DLMS_ERROR_CODE_FALSE;
             }
             else
             {
+				cout << "Setting taret packet length" << (buff.GetPosition() + value) <<endl;
                 target->SetPacketLength(buff.GetPosition() + value);
             }
             break;
         }
         else
         {
+			cout << "DLMS version is not 1. Skip." << endl;
             buff.SetPosition(buff.GetPosition() - 1);
         }
     }
     if (!isData)
     {
+		cout << "PDU is not DATA but notif" <<endl;
         return DLMS_ERROR_CODE_FALSE;
     }
     return DLMS_ERROR_CODE_OK;
@@ -3710,8 +3746,11 @@ int CGXDLMS::CheckWrapperAddress(
 {
     int ret;
     unsigned short value;
+	cout << "CheckWrapperAddress" <<endl;
     if (settings.IsServer())
     {
+		cout << "IsServer" <<endl;
+
         if ((ret = buff.GetUInt16(&value)) != 0)
         {
             return ret;
@@ -3744,6 +3783,8 @@ int CGXDLMS::CheckWrapperAddress(
     }
     else
     {
+		cout << "IsServer false" <<endl;
+
         if ((ret = buff.GetUInt16(&value)) != 0)
         {
             return ret;
@@ -3752,14 +3793,17 @@ int CGXDLMS::CheckWrapperAddress(
         if (settings.GetServerAddress() != 0
             && settings.GetServerAddress() != value)
         {
+			cout << "Server address differs" <<endl;
             if (notify == NULL)
             {
+				cout << "notif is null -> exit" << endl;
                 return DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS;
             }
             notify->SetServerAddress(value);
         }
         else
         {
+			cout << "Server address matches. Do nothing" << endl;
             settings.SetServerAddress(value);
         }
 
@@ -3771,18 +3815,24 @@ int CGXDLMS::CheckWrapperAddress(
         if (settings.GetClientAddress() != 0
             && settings.GetClientAddress() != value)
         {
+			cout << "Client address difers" <<endl;
             if (notify != NULL)
             {
+				cout << "Setting Notification address"<<endl;
                 notify->SetClientAddress(value);
                 return DLMS_ERROR_CODE_FALSE;
             }
+			cout << "Notif is null, exit." <<endl;
             return DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS;
         }
         else
         {
+			cout << "Setting client address to be the same" <<endl;
             settings.SetClientAddress(value);
         }
     }
+	
+	cout << "Returning error code OK"<<endl;
     return DLMS_ERROR_CODE_OK;
 }
 
