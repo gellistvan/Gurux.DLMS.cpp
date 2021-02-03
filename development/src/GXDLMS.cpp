@@ -2167,7 +2167,6 @@ int CGXDLMS::HandleEventNotification(
   {
     reply.GetData().GetUInt32(&attribute_value.ulVal);
   }
-  attribute_value.vt = DLMS_DATA_TYPE_STRUCTURE;
   reply.GetValue().Arr.push_back(attribute_value);
 
   return DLMS_ERROR_CODE_OK;
