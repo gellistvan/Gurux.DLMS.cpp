@@ -2945,7 +2945,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
         {
             return ret;
         }
-        if (ret == DLMS_ERROR_CODE_FALSE && target->IsComplete())
+        if (ret == DLMS_ERROR_CODE_FALSE && notify->IsComplete())
         {
 			cout << "ErrorCodeFalse and isComplete"<<endl;
             if (notify != NULL)
