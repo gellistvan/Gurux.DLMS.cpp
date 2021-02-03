@@ -2156,7 +2156,7 @@ int CGXDLMS::HandleEventNotification(
     CGXDLMSSettings& settings,
     CGXReplyData& reply)
 {
-  Printer("HandleEventNotification");
+  Printer a("HandleEventNotification");
 	
   unsigned char invokeId;
   int ret;
@@ -2707,7 +2707,7 @@ int CGXDLMS::GetPdu(
     int ret = DLMS_ERROR_CODE_OK;
     unsigned char ch;
     DLMS_COMMAND cmd = data.GetCommand();
-	cout << Printer::PrintTabs() << "Get PDU, command: " << data.GetCommand() << endl;
+	Printer p("GetPDU");
     // If header is not read yet or GBT message.
     if (cmd == DLMS_COMMAND_NONE)
     {
@@ -2956,6 +2956,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     int ret;
     unsigned char frame = 0;
     bool isNotify = false;
+    Printer p("GetData function");
     // If DLMS frame is generated.
     if (settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC)
     {
