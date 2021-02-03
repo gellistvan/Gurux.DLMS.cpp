@@ -51,7 +51,7 @@ public:
     for (int i = 0; i<block_count; i++)
       cout <<"  ";
 
-    cout << Printer.PrintTabs() << name <<endl;
+    cout << name <<endl;
     block_count++;
   }
 
@@ -68,7 +68,7 @@ public:
     for (int i = 0; i<block_count; i++)
       cout <<"  ";
 
-    cout << Printer.PrintTabs() << name <<endl;
+    cout << name <<endl;
   }
 
   std::string name {};
@@ -2167,7 +2167,7 @@ int CGXDLMS::HandleEventNotification(
   //Invoke ID and priority.
   if ((ret = reply.GetData().GetUInt8(&invokeId)) != 0)
   {
-	cout << Printer.PrintTabs() << "Retval invoke Id " << ret <<endl;
+	cout << Printer::PrintTabs() << "Retval invoke Id " << ret <<endl;
     return ret;
   }
   std::cout <<"Invoke id: " << (int) invokeId << endl;
@@ -2176,10 +2176,10 @@ int CGXDLMS::HandleEventNotification(
 
   if ((ret = reply.GetData().GetUInt16(&class_id.uiVal)) != 0)
   {
-	cout << Printer.PrintTabs() << "Retval class id " << ret << endl;
+	cout << Printer::PrintTabs() << "Retval class id " << ret << endl;
     return ret;
   }
-  cout << Printer.PrintTabs() << "Class id: " << class_id.uiVal << endl;
+  cout << Printer::PrintTabs() << "Class id: " << class_id.uiVal << endl;
   
   class_id.vt = DLMS_DATA_TYPE_UINT16;
   attribute_descriptor.Arr.push_back(class_id);
@@ -2192,10 +2192,10 @@ int CGXDLMS::HandleEventNotification(
 
   if ((ret = reply.GetData().GetUInt8(&attribute_id.bVal)) != 0)
   {
-	cout << Printer.PrintTabs() << "Retval attribute id " << ret << endl;
+	cout << Printer::PrintTabs() << "Retval attribute id " << ret << endl;
     return ret;
   }
-  cout << Printer.PrintTabs() << "Attribute id: "<<attribute_id.bVal<<endl;
+  cout << Printer::PrintTabs() << "Attribute id: "<<attribute_id.bVal<<endl;
   
   attribute_id.vt = DLMS_DATA_TYPE_UINT8;
   attribute_descriptor.Arr.push_back(attribute_id);
@@ -2211,11 +2211,11 @@ int CGXDLMS::HandleEventNotification(
   if (attribute_value.vt == DLMS_DATA_TYPE_UINT32)
   {
     reply.GetData().GetUInt32(&attribute_value.ulVal);
-	cout << Printer.PrintTabs() << "Value value type is uint32_t, value:" << attribute_value.ulVal <<endl;
+	cout << Printer::PrintTabs() << "Value value type is uint32_t, value:" << attribute_value.ulVal <<endl;
   }
   else
   {
-	cout << Printer.PrintTabs() << "Attribute value type: " << attribute_value.vt << endl;
+	cout << Printer::PrintTabs() << "Attribute value type: " << attribute_value.vt << endl;
   }
   attribute_value.vt = DLMS_DATA_TYPE_STRUCTURE;
   reply.GetValue().Arr.push_back(attribute_value);
@@ -2707,7 +2707,7 @@ int CGXDLMS::GetPdu(
     int ret = DLMS_ERROR_CODE_OK;
     unsigned char ch;
     DLMS_COMMAND cmd = data.GetCommand();
-	cout << Printer.PrintTabs() << "Get PDU, command: " << data.GetCommand() << endl;
+	cout << Printer::PrintTabs() << "Get PDU, command: " << data.GetCommand() << endl;
     // If header is not read yet or GBT message.
     if (cmd == DLMS_COMMAND_NONE)
     {
@@ -2931,7 +2931,7 @@ int CGXDLMS::GetPdu(
         && data.GetCommandType() == DLMS_SINGLE_READ_RESPONSE_DATA_BLOCK_RESULT
         && (data.GetMoreData() & DLMS_DATA_REQUEST_TYPES_FRAME) != 0)
     {
-        cout << Printer.PrintTabs() << "GetPDU return 0" <<endl;
+        cout << Printer::PrintTabs() << "GetPDU return 0" <<endl;
         return 0;
     }
 
@@ -2941,7 +2941,7 @@ int CGXDLMS::GetPdu(
         && (data.GetMoreData() == DLMS_DATA_REQUEST_TYPES_NONE
             || data.GetPeek()))
     {
-        cout << Printer.PrintTabs() << "GetPDU return GetValueFromData" <<endl;
+        cout << Printer::PrintTabs() << "GetPDU return GetValueFromData" <<endl;
         ret = GetValueFromData(settings, data);
     }
     return ret;
@@ -2981,7 +2981,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
           Printer b("ErrorCodeFalse and isComplete");
             if (notify != NULL)
             {
-				cout << Printer.PrintTabs() << "Notify is not null" << endl;
+				cout << Printer::PrintTabs() << "Notify is not null" << endl;
                 target = notify;
             }			
             isNotify = true;
@@ -2989,14 +2989,14 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
     }
     else
     {
-		cout << Printer.PrintTabs() << "Interface type unknown" <<endl;
+		cout << Printer::PrintTabs() << "Interface type unknown" <<endl;
         // Invalid Interface type.
         return DLMS_ERROR_CODE_INVALID_PARAMETER;
     }
     // If all data is not read yet.
     if (!target->IsComplete())
     {
-		cout << Printer.PrintTabs() << "Target is NOT complete. Exit." << endl;
+		cout << Printer::PrintTabs() << "Target is NOT complete. Exit." << endl;
         return DLMS_ERROR_CODE_FALSE;
     }
     GetDataFromFrame(reply, *target, settings.GetInterfaceType() == DLMS_INTERFACE_TYPE_HDLC);
@@ -3573,7 +3573,7 @@ int CGXDLMS::GetTcpData(
     // If whole frame is not received yet.
     if (buff.GetSize() - buff.GetPosition() < 8)
     {
-		cout << Printer.PrintTabs() << "Not complete" << endl;
+		cout << Printer::PrintTabs() << "Not complete" << endl;
         data.SetComplete(false);
         return DLMS_ERROR_CODE_OK;
     }
@@ -3590,7 +3590,7 @@ int CGXDLMS::GetTcpData(
         // Get version
         if ((ret = buff.GetUInt16(&value)) != 0)
         {
-			cout << Printer.PrintTabs() << "Could not read DLMS version" << endl;
+			cout << Printer::PrintTabs() << "Could not read DLMS version" << endl;
             return DLMS_ERROR_CODE_OK;
         }
         if (value == 1)
@@ -3609,7 +3609,7 @@ int CGXDLMS::GetTcpData(
             // Get length.
             if ((ret = buff.GetUInt16(&value)) != 0)
             {
-				cout << Printer.PrintTabs() << "Could not read length" <<endl;
+				cout << Printer::PrintTabs() << "Could not read length" <<endl;
                 return ret;
             }
 
@@ -3623,20 +3623,20 @@ int CGXDLMS::GetTcpData(
             }
             else
             {
-				cout << Printer.PrintTabs() << "Setting taret packet length" << (buff.GetPosition() + value) <<endl;
+				cout << Printer::PrintTabs() << "Setting taret packet length" << (buff.GetPosition() + value) <<endl;
                 target->SetPacketLength(buff.GetPosition() + value);
             }
             break;
         }
         else
         {
-			cout << Printer.PrintTabs() << "DLMS version is not 1. Skip." << endl;
+			cout << Printer::PrintTabs() << "DLMS version is not 1. Skip." << endl;
             buff.SetPosition(buff.GetPosition() - 1);
         }
     }
     if (!isData)
     {
-		cout << Printer.PrintTabs() << "PDU is not DATA but notif" <<endl;
+		cout << Printer::PrintTabs() << "PDU is not DATA but notif" <<endl;
         return DLMS_ERROR_CODE_FALSE;
     }
     return DLMS_ERROR_CODE_OK;
@@ -3782,7 +3782,7 @@ int CGXDLMS::CheckWrapperAddress(
     Printer a("CheckWrapperAddress");
     if (settings.IsServer())
     {
-		cout << Printer.PrintTabs() << "IsServer" <<endl;
+		cout << Printer::PrintTabs() << "IsServer" <<endl;
 
         if ((ret = buff.GetUInt16(&value)) != 0)
         {
@@ -3829,14 +3829,14 @@ int CGXDLMS::CheckWrapperAddress(
 			Printer c("Server address differs");
             if (notify == NULL)
             {
-				cout << Printer.PrintTabs() << "notif is null -> exit" << endl;
+				cout << Printer::PrintTabs() << "notif is null -> exit" << endl;
                 return DLMS_ERROR_CODE_INVALID_SERVER_ADDRESS;
             }
             notify->SetServerAddress(value);
         }
         else
         {
-			cout << Printer.PrintTabs() << "Server address matches. Do nothing" << endl;
+			cout << Printer::PrintTabs() << "Server address matches. Do nothing" << endl;
             settings.SetServerAddress(value);
         }
 
@@ -3851,21 +3851,21 @@ int CGXDLMS::CheckWrapperAddress(
 			Printer c("Client address difers");
             if (notify != NULL)
             {
-				cout << Printer.PrintTabs() << "Setting Notification address"<<endl;
+				cout << Printer::PrintTabs() << "Setting Notification address"<<endl;
                 notify->SetClientAddress(value);
                 return DLMS_ERROR_CODE_FALSE;
             }
-			cout << Printer.PrintTabs() << "Notif is null, exit." <<endl;
+			cout << Printer::PrintTabs() << "Notif is null, exit." <<endl;
             return DLMS_ERROR_CODE_INVALID_CLIENT_ADDRESS;
         }
         else
         {
-			cout << Printer.PrintTabs() << "Setting client address to be the same" <<endl;
+			cout << Printer::PrintTabs() << "Setting client address to be the same" <<endl;
             settings.SetClientAddress(value);
         }
     }
 	
-	cout << Printer.PrintTabs() << "Returning error code OK"<<endl;
+	cout << Printer::PrintTabs() << "Returning error code OK"<<endl;
     return DLMS_ERROR_CODE_OK;
 }
 
