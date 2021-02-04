@@ -2970,6 +2970,7 @@ int CGXDLMS::GetData(CGXDLMSSettings& settings,
             data.SetTime(0);
             notify->GetData().Set(&d, d.GetPosition(), d.GetSize() - d.GetPosition());
             data.GetData().Trim();
+            notify->SetValue(data.GetValue());
             break;
         default:
             break;
